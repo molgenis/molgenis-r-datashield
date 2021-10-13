@@ -68,19 +68,14 @@ test_that("dsIsCompleted retrieves status of COMPLETED async command", {
   )
 
   content <- mock(list(status = "COMPLETED"))
-  get <- mock(content)
 
   value <- with_mock(
-    "httr::GET" = get,
+    "DSMolgenisArmadillo::.handle_last_command" = mock(content),
     "httr::content" = content,
     dsIsCompleted(result)
   )
-
+  
   expect_equal(value, TRUE)
-  expect_args(get, 1,
-    handle = connection@handle,
-    path = "/lastcommand"
-  )
 })
 
 test_that("dsIsCompleted retrieves status of RUNNING async command", {
@@ -90,19 +85,31 @@ test_that("dsIsCompleted retrieves status of RUNNING async command", {
   )
 
   content <- mock(list(status = "RUNNING"))
-  get <- mock(content)
 
   value <- with_mock(
-    "httr::GET" = get,
+    "DSMolgenisArmadillo::.handle_last_command" = mock(content),
     "httr::content" = content,
     dsIsCompleted(result)
   )
 
   expect_equal(value, FALSE)
-  expect_args(get, 1,
-    handle = connection@handle,
-    path = "/lastcommand"
+})
+
+test_that("dsIsCompleted retrieves status of FAILED async command", {
+  result <- methods::new("ArmadilloResult",
+                         conn = connection,
+                         rval = list(result = NULL, async = TRUE)
   )
+  
+  content <- mock(list(status = "FAILED", message = "Error"))
+  
+  value <-  with_mock(
+      "DSMolgenisArmadillo::.handle_last_command" = mock(content),
+      "httr::content" = content,
+      dsIsCompleted(result)
+    )
+  expect_equal(value, FALSE)
+
 })
 
 test_that("dsIsCompleted returns status of sync command", {

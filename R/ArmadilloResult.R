@@ -90,14 +90,8 @@ methods::setMethod(
   "dsIsCompleted", "ArmadilloResult",
   function(res) { # nolint
     if (res@rval$async) {
-      result <- httr::GET(
-        handle = res@conn@handle,
-        path = "/lastcommand"
-      )
-      
-      .handle_last_command_error(result)
-      
-      httr::content(result)$status == "COMPLETED"
+      command <- .handle_last_command(res@conn@handle)
+      httr::content(command)$status == "COMPLETED"
     } else {
       TRUE
     }
