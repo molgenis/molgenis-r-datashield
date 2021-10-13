@@ -94,6 +94,9 @@ methods::setMethod(
         handle = res@conn@handle,
         path = "/lastcommand"
       )
+      
+      .handle_last_command_error(result)
+      
       httr::content(result)$status == "COMPLETED"
     } else {
       TRUE
