@@ -1,3 +1,7 @@
+# 1.3.7 Checked on FAILED in async requests
+
+* Fix: infinite loop is caused by not checking on FAILED state in async request
+
 ## 1.3.6 Changed maintainer
 * Make Sido maintainer
 * Fix the travis badge
