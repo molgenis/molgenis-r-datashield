@@ -1,21 +1,22 @@
-#' Handle last command errors
+#' Handle last command
 #'
-#' When the last command endpoint fails, handle errors
+#' When the last result endpoint fails call lastcommand endpoint to check if that has failed as well or send a different status
 #'
 #' @param handle HTTR handle
 #'
 #' @importFrom httr GET content
 #'
-#' @return error message only
+#' @return error message when failure or command object when other status applies
 #'
 #' @noRd
-.handle_last_command_error <- function(handle) {
+.handle_last_command <- function(handle) {
   command <- httr::GET(handle = handle, path = "/lastcommand")
 
   json_content <- httr::content(command)
   if (json_content$status == "FAILED") {
     stop(paste0("Execution failed: ", json_content$message), call. = FALSE)
   }
+  return(command)
 }
 
 #' Handle generic request errrors
@@ -78,7 +79,7 @@
   .handle_request_error(response)
 
   if (response$status_code == 404) {
-    .handle_last_command_error(conn@handle)
+    .handle_last_command(conn@handle)
   } else {
     content <- httr::content(response)
     if (is.null(content)) {

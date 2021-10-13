@@ -1,4 +1,4 @@
-test_that(".handle_last_command_error throws error message", {
+test_that(".handle_last_command throws error message", {
   handle <- mock()
   ok <- list(status_code = 200)
   get <- mock(ok)
@@ -6,7 +6,7 @@ test_that(".handle_last_command_error throws error message", {
 
   expect_error(
     with_mock(
-      .handle_last_command_error(handle),
+      .handle_last_command(handle),
       "httr::GET" = get,
       "httr::content" = content
     ), "Error"
@@ -16,18 +16,34 @@ test_that(".handle_last_command_error throws error message", {
   expect_args(content, 1, ok)
 })
 
-test_that(".handle_last_command_error only works if status is FAILED", {
+test_that(".handle_last_command stops only if status is FAILED", {
   handle <- mock()
   ok <- list(status_code = 200)
   get <- mock(ok)
   content <- mock(list(status = "COMPLETED"))
 
   with_mock(
-    .handle_last_command_error(handle),
+    .handle_last_command(handle),
     "httr::GET" = get,
     "httr::content" = content
   )
 
+  expect_args(get, 1, handle = handle, path = "/lastcommand")
+})
+
+test_that(".handle_last_command returns the command object when successfully finished", {
+  handle <- mock()
+  ok <- list(status_code = 200, status = "COMPLETED")
+  get <- mock(ok)
+  content <- mock(list(status = "COMPLETED"))
+  
+  value <- with_mock(
+    .handle_last_command(handle),
+    "httr::GET" = get,
+    "httr::content" = content
+  )
+
+  expect_equal(value$status, "COMPLETED")
   expect_args(get, 1, handle = handle, path = "/lastcommand")
 })
 
