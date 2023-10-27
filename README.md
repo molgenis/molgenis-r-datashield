@@ -120,23 +120,14 @@ with Armadillo version 3. If you still use Armadillo 2, you should use
 the 1.4.1 version of DSMolgenisArmadillo You can install this specific
 version the following commands:
 
-For windows:
-
 ``` r
-packageurl <- "https://cran.rstudio.com/bin/windows/contrib/4.2/DSMolgenisArmadillo_1.4.1.zip"
+packageurl <- "https://cran.r-project.org/src/contrib/Archive/DSMolgenisArmadillo/DSMolgenisArmadillo_1.4.1.tar.gz"
 install.packages(packageurl, repos=NULL, type="source")
 ```
 
-For Mac:
-
+If you already installed another version of the package, you might want to run this first:
 ``` r
-packageurl <- "hhttps://cran.rstudio.com/bin/macosx/contrib/4.2/DSMolgenisArmadillo_1.4.1.tgz"
-install.packages(packageurl, repos=NULL, type="source")
+remove.packages("MolgenisArmadillo")
 ```
 
-For Linux:
-
-``` r
-packageurl <- "https://cran.rstudio.com/src/contrib/DSMolgenisArmadillo_1.4.1.tar.gz"
-install.packages(packageurl, repos=NULL, type="source")
-```
+On windows additional R packages like `rtools` might be required in order to install the `tar.gz` package from the url.
