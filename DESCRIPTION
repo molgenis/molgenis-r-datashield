@@ -58,7 +58,7 @@ License: LGPL (>= 2.1)
 URL: https://github.com/molgenis/molgenis-r-datashield/,
   https://molgenis.github.io/molgenis-r-datashield/
 BugReports: https://github.com/molgenis/molgenis-r-datashield/issues/
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 VignetteBuilder: knitr
 Encoding: UTF-8
 Collate: 
