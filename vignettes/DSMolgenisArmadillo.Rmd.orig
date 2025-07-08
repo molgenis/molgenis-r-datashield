@@ -19,9 +19,48 @@ When you start to use Armadillo as a backend for DataSHIELD you can use the `DSM
 There is a default workflow in DataSHIELD to do analysis. These are the steps that you need to take:
 
 ### Authenticate
-First obtain a token from the authentication server to authenticate in DataSHIELD.
+First obtain a authentication credentials from the authentication server to authenticate in DataSHIELD. These
+credentials contain an access token along with an authentication token which is used to refresh the session
+if it has timed out.
 
-```{r, obtain token}
+```{r, get credentials}
+# Load the necessary packages.
+library(dsBaseClient)
+library(DSMolgenisArmadillo)
+
+# specify server url
+armadillo_url <- "https://armadillo-demo.molgenis.net"
+
+# get token from central authentication server
+token <- armadillo.get_credentials(armadillo_url)
+```
+
+Then build a login dataframe and perform the login on the Armadillo server.
+The important part is to specify the driver. This should be `ArmadilloDriver`.
+
+```{r login}
+# build the login dataframe
+builder <- DSI::newDSLoginBuilder()
+builder$append(
+  server = "armadillo",
+  url = armadillo_url,
+  token = token@access_token,
+  driver = "ArmadilloDriver",
+  profile = "xenon",
+  )
+
+# create loginframe
+login_data <- builder$build()
+
+# login to server
+conns <- DSI::datashield.login(logins = login_data, assign = FALSE)
+```
+
+### Authenticate (legacy)
+In previous versions of `DSMolgenisArmadillo` token refreshing was not possible and
+tokens were requested using `armadillo.get_token`.
+
+```{r, get credentials legacy}
 # Load the necessary packages.
 library(dsBaseClient)
 library(DSMolgenisArmadillo)
@@ -33,11 +72,10 @@ armadillo_url <- "https://armadillo-demo.molgenis.net"
 token <- armadillo.get_token(armadillo_url)
 ```
 
-Then build a login dataframe and perform the login on the Armadillo server.
-The important part is to specify the driver. This should be `ArmadilloDriver`.
-```{r, login}
-# build the login dataframe
+```{r login legacy}
+# Build login dataframe
 builder <- DSI::newDSLoginBuilder()
+
 builder$append(
   server = "armadillo",
   url = armadillo_url,
@@ -46,10 +84,9 @@ builder$append(
   profile = "xenon",
   )
 
-# create loginframe
 login_data <- builder$build()
 
-# login into server
+# login to server
 conns <- DSI::datashield.login(logins = login_data, assign = FALSE)
 ```
 

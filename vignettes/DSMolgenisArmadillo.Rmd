@@ -13,7 +13,49 @@ When you start to use Armadillo as a backend for DataSHIELD you can use the `DSM
 There is a default workflow in DataSHIELD to do analysis. These are the steps that you need to take:
 
 ### Authenticate
-First obtain a token from the authentication server to authenticate in DataSHIELD.
+First obtain a authentication credentials from the authentication server to authenticate in DataSHIELD. These
+credentials contain an access token along with an authentication token which is used to refresh the session
+if it has timed out.
+
+
+```r
+# Load the necessary packages.
+library(dsBaseClient)
+library(DSMolgenisArmadillo)
+
+# specify server url
+armadillo_url <- "https://armadillo-demo.molgenis.net"
+
+# get token from central authentication server
+token <- armadillo.get_credentials(armadillo_url)
+#> [1] "We're opening a browser so you can log in with code V6TRZV"
+```
+
+Then build a login dataframe and perform the login on the Armadillo server.
+The important part is to specify the driver. This should be `ArmadilloDriver`.
+
+
+```r
+# build the login dataframe
+builder <- DSI::newDSLoginBuilder()
+builder$append(
+  server = "armadillo",
+  url = armadillo_url,
+  token = token@access_token,
+  driver = "ArmadilloDriver",
+  profile = "xenon",
+  )
+
+# create loginframe
+login_data <- builder$build()
+
+# login to server
+conns <- DSI::datashield.login(logins = login_data, assign = FALSE)
+```
+
+### Authenticate (legacy)
+In previous versions of `DSMolgenisArmadillo` token refreshing was not possible and
+tokens were requested using `armadillo.get_token`.
 
 
 ```r
@@ -26,15 +68,14 @@ armadillo_url <- "https://armadillo-demo.molgenis.net"
 
 # get token from central authentication server
 token <- armadillo.get_token(armadillo_url)
-#> [1] "We're opening a browser so you can log in with code 5FW3FV"
+#> [1] "We're opening a browser so you can log in with code NFRDG5"
 ```
 
-Then build a login dataframe and perform the login on the Armadillo server.
-The important part is to specify the driver. This should be `ArmadilloDriver`.
 
 ```r
-# build the login dataframe
+# Build login dataframe
 builder <- DSI::newDSLoginBuilder()
+
 builder$append(
   server = "armadillo",
   url = armadillo_url,
@@ -43,10 +84,9 @@ builder$append(
   profile = "xenon",
   )
 
-# create loginframe
 login_data <- builder$build()
 
-# login into server
+# login to server
 conns <- DSI::datashield.login(logins = login_data, assign = FALSE)
 ```
 
@@ -88,19 +128,70 @@ You can check which tables (`data.frame`'s) are available on the Armadillo.
 ```r
 datashield.tables(conns)
 #> $armadillo
-#>  [1] "study1/2_1-core-1_0/nonrep"               "study1/2_1-core-1_0/yearlyrep"           
-#>  [3] "study1/1_1-outcome-1_0/yearlyrep"         "gecko/2_1-core-1_0/trimesterrep"         
-#>  [5] "gecko/2_1-core-1_0/nonrep"                "gecko/2_1-core-1_0/yearlyrep"            
-#>  [7] "gecko/2_1-core-1_0/monthlyrep"            "gecko/1_1-outcome-1_0/nonrep"            
-#>  [9] "gecko/1_1-outcome-1_0/yearlyrep"          "test/data/LT-example-dataset_long-format"
-#> [11] "test/data/d"                              "trajectories/data/alspac"                
-#> [13] "trajectories/data/chs"                    "trajectories/data/bib"                   
-#> [15] "trajectories/data/bcg"                    "trajectories/data/d"                     
-#> [17] "trajectories/data/probit"                 "inma/1_2_urban_ath_1_0/yearly_rep"       
-#> [19] "inma/1_2_urban_ath_1_0/trimester_rep"     "inma/1_2_urban_ath_1_0/non_rep"          
-#> [21] "inma/1_1_outcome_ath_1_0/trimester_rep"   "inma/1_1_outcome_ath_1_0/non_rep"        
-#> [23] "inma/1_0_outcome_ath_1_0/trimester_rep"   "inma/1_0_outcome_ath_1_0/non_rep"        
-#> [25] "longitools/testparquet/LT_example_data"   "longitools/mydata/nonrep"
+#>   [1] "examplelink5/test-sub/non_rep"               "examplelink5/test-sub/yearly_rep"           
+#>   [3] "my-link/eos-demo/table"                      "examplelink11/test-sub/non_rep"             
+#>   [5] "examplelink11/test-sub/yearly_rep"           "examplelink13/test-sub/non_rep"             
+#>   [7] "examplelink13/test-sub/yearly_rep"           "examplelink14/test-sub/non_rep"             
+#>   [9] "examplelink14/test-sub/yearly_rep"           "examplelink9/test-sub/non_rep"              
+#>  [11] "examplelink9/test-sub/yearly_rep"            "nch3o1r0zn/2_1-core-1_0/trimesterrep"       
+#>  [13] "nch3o1r0zn/2_1-core-1_0/nonrep"              "nch3o1r0zn/2_1-core-1_0/yearlyrep"          
+#>  [15] "nch3o1r0zn/2_1-core-1_0/monthlyrep"          "nch3o1r0zn/1_1-outcome-1_0/nonrep"          
+#>  [17] "nch3o1r0zn/1_1-outcome-1_0/yearlyrep"        "nch3o1r0zn/survival/veteran"                
+#>  [19] "chop/2_6_core_1_3/non_rep"                   "chop/2_6_core_1_2/non_rep"                  
+#>  [21] "chop/2_6_core_1_1/non_rep"                   "examplelink8/test-sub/non_rep"              
+#>  [23] "examplelink8/test-sub/yearly_rep"            "new-subset-folder/data/mtcars-2"            
+#>  [25] "genr/2_5-core-6_0/non_rep"                   "genr/2_5_core_6_0/non_rep"                  
+#>  [27] "testsubset/core/testtable"                   "testsubset/core/yearlyrep"                  
+#>  [29] "testsubset/core/nonrep"                      "test-ds-upload/test_data/mtcars"            
+#>  [31] "study1/core/year_rep"                        "study1/core/non_rep"                        
+#>  [33] "study1/outcome/year_rep"                     "lifecycle/core/nonrep"                      
+#>  [35] "lifecycle/core/yearlyrep"                    "gecko/2_1-core-1_0/trimesterrep"            
+#>  [37] "gecko/2_1-core-1_0/nonrep"                   "gecko/2_1-core-1_0/yearlyrep"               
+#>  [39] "gecko/2_1-core-1_0/monthlyrep"               "gecko/1_3_outcome_ath_1_0/trimester_rep"    
+#>  [41] "gecko/1_3_outcome_ath_1_0/non_rep"           "gecko/1_1-outcome-1_0/nonrep"               
+#>  [43] "gecko/1_1-outcome-1_0/yearlyrep"             "gecko/test-lt/LT_example_data"              
+#>  [45] "link-test/core-variables/nonrep"             "ds-workshop-24/data/selfesteem"             
+#>  [47] "ds-workshop-24/data/CNSIM2"                  "ds-workshop-24/data/CNSIM3"                 
+#>  [49] "ds-workshop-24/data/test_link"               "ds-workshop-24/data/CNSIM1"                 
+#>  [51] "examplelink10/test-sub/non_rep"              "examplelink10/test-sub/yearly_rep"          
+#>  [53] "study2/core/year_rep"                        "fix-subset/core/testtable"                  
+#>  [55] "examplelink12/test-sub/non_rep"              "examplelink12/test-sub/yearly_rep"          
+#>  [57] "examplelink6/test-sub/non_rep"               "examplelink6/test-sub/yearly_rep"           
+#>  [59] "test/data/mtcars"                            "test/data/LT-example-dataset_long-format"   
+#>  [61] "test/data/d"                                 "test/view/view-tabel"                       
+#>  [63] "test/test/test"                              "armadillo-illustration/barcelona/pancreatic"
+#>  [65] "armadillo-illustration/groningen/pancreatic" "trajectories/data/alspac"                   
+#>  [67] "trajectories/data/chs"                       "trajectories/data/bib"                      
+#>  [69] "trajectories/data/bcg"                       "trajectories/data/probit"                   
+#>  [71] "ninfea/2_7_core_1_2/yearly_rep"              "ninfea/2_7_core_1_2/monthly_rep"            
+#>  [73] "ninfea/2_7_core_1_2/trimester_rep"           "ninfea/2_7_core_1_2/non_rep"                
+#>  [75] "ninfea/2_7_core_1_4/non_rep"                 "ninfea/2_7_core_1_1/yearly_rep"             
+#>  [77] "ninfea/2_7_core_1_1/monthly_rep"             "ninfea/2_7_core_1_1/trimester_rep"          
+#>  [79] "ninfea/2_7_core_1_1/non_rep"                 "ninfea/1_0_outcome_ath_1_0/trimester_rep"   
+#>  [81] "ninfea/1_0_outcome_ath_1_0/non_rep"          "ninfea/2_7_core_1_3/non_rep"                
+#>  [83] "ninfea/1_0_outcome_ath_1_2/non_rep"          "ninfea/2_7_core_1_5/non_rep"                
+#>  [85] "ninfea/2_7_core_1_0/yearly_rep"              "ninfea/2_7_core_1_0/monthly_rep"            
+#>  [87] "ninfea/2_7_core_1_0/trimester_rep"           "ninfea/2_7_core_1_0/non_rep"                
+#>  [89] "ninfea/1_0_outcome_ath_1_1/non_rep"          "ninfea/1_0_outcome_ath_1_3/non_rep"         
+#>  [91] "life-cycle/nonrep/nonrep"                    "testninfea/2_7_core_2_7/yearly_rep"         
+#>  [93] "testninfea/2_7_core_2_7/monthly_rep"         "testninfea/2_7_core_2_7/trimester_rep"      
+#>  [95] "testninfea/2_7_core_2_7/non_rep"             "examplelink4/test-sub/non_rep"              
+#>  [97] "examplelink4/test-sub/yearly_rep"            "inma/1_2_urban_ath_1_0/yearly_rep"          
+#>  [99] "inma/1_2_urban_ath_1_0/trimester_rep"        "inma/1_2_urban_ath_1_0/non_rep"             
+#> [101] "inma/1_0_outcome_ath_2_1/trimester_rep"      "inma/1_0_outcome_ath_2_1/non_rep"           
+#> [103] "inma/TEST/trimester_rep"                     "inma/1_0_outcome_ath_1_0/trimester_rep"     
+#> [105] "inma/1_0_outcome_ath_1_0/non_rep"            "inma/2_6_core_1_0/monthly_rep"              
+#> [107] "inma/2_6_core_1_0/non_rep"                   "inma/1_0_outcome_ath_1_2/trimester_rep"     
+#> [109] "inma/1_0_outcome_ath_1_2/non_rep"            "inma/1_0_outcome_ath_1_1/trimester_rep"     
+#> [111] "inma/1_0_outcome_ath_1_1/non_rep"            "inma/1_3_outcome_ath_1_1/trimester_rep"     
+#> [113] "inma/1_3_outcome_ath_1_1/non_rep"            "inma/1_0_outcome_ath_1_3/trimester_rep"     
+#> [115] "inma/1_0_outcome_ath_1_3/non_rep"            "inma/1_0_outcome_ath_1_5/trimester_rep"     
+#> [117] "inma/1_0_outcome_ath_1_5/non_rep"            "inma/1_0_outcome_ath_1_4/trimester_rep"     
+#> [119] "inma/1_0_outcome_ath_1_4/non_rep"            "inma/1_0_outcome_ath_1_6/trimester_rep"     
+#> [121] "inma/1_0_outcome_ath_1_6/non_rep"            "test-delete/data/"                          
+#> [123] "xenon-tests/2_1-core-1_0/nonrep"             "xenon-tests/survival/veteran"               
+#> [125] "examplelink7/test-sub/non_rep"               "examplelink7/test-sub/yearly_rep"           
+#> [127] "test-subset-function/data/mtcars"
 ```
 
 And load data from one of these tables.
@@ -119,28 +210,33 @@ datashield.assign.table(
 # check the columns in the non-repeated data
 ds.colnames("core_nonrep", datasources = conns)
 #> $armadillo
-#>   [1] "row_id"              "child_id"            "mother_id"           "cohort_id"           "preg_no"            
-#>   [6] "child_no"            "coh_country"         "recruit_age"         "cob_m"               "ethn1_m"            
-#>  [11] "ethn2_m"             "ethn3_m"             "agebirth_m_y"        "agebirth_m_d"        "death_m"            
-#>  [16] "death_m_age"         "prepreg_weight"      "prepreg_weight_mes"  "prepreg_weight_ga"   "latepreg_weight"    
-#>  [21] "latepreg_weight_mes" "latepreg_weight_ga"  "preg_gain"           "preg_gain_mes"       "height_m"           
-#>  [26] "height_mes_m"        "prepreg_dia"         "preg_dia"            "preg_thyroid"        "preg_fever"         
-#>  [31] "preeclam"            "preg_ht"             "asthma_m"            "prepreg_psych"       "preg_psych"         
-#>  [36] "ppd"                 "prepreg_smk"         "prepreg_cig"         "preg_smk"            "preg_cig"           
-#>  [41] "prepreg_alc"         "prepreg_alc_unit"    "preg_alc"            "preg_alc_unit"       "folic_prepreg"      
-#>  [46] "folic_preg12"        "folic_post12"        "parity_m"            "preg_plan"           "mar"                
-#>  [51] "ivf"                 "outcome"             "mode_delivery"       "plac_abrup"          "cob_p"              
-#>  [56] "cob_p_fath"          "ethn1_p"             "ethn2_p"             "ethn3_p"             "ethn_p_fath"        
-#>  [61] "agebirth_p_y"        "agebirth_p_d"        "agebirth_p_fath"     "death_p"             "death_p_age"        
-#>  [66] "death_p_fath"        "weight_f1"           "weight_mes_f1"       "weight_f1_fath"      "height_f1"          
-#>  [71] "height_mes_f1"       "height_f1_fath"      "dia_bf"              "asthma_bf"           "psych_bf"           
-#>  [76] "smk_p"               "smk_cig_p"           "smk_fath"            "birth_month"         "birth_year"         
-#>  [81] "apgar"               "neo_unit"            "sex"                 "plurality"           "ga_lmp"             
-#>  [86] "ga_us"               "ga_mr"               "ga_bj"               "birth_weight"        "birth_length"       
-#>  [91] "birth_head_circum"   "weight_who_ga"       "plac_weight"         "con_anomalies"       "major_con_anomalies"
-#>  [96] "cer_palsy"           "sibling_pos"         "death_child"         "death_child_age"     "breastfed_excl"     
-#> [101] "breastfed_any"       "breastfed_ever"      "solid_food"          "childcare_intro"     "cats_preg"          
-#> [106] "dogs_preg"           "cats_quant_preg"     "dogs_quant_preg"
+#>   [1] "row_id"              "child_id"            "mother_id"           "cohort_id"          
+#>   [5] "preg_no"             "child_no"            "coh_country"         "recruit_age"        
+#>   [9] "cob_m"               "ethn1_m"             "ethn2_m"             "ethn3_m"            
+#>  [13] "agebirth_m_y"        "agebirth_m_d"        "death_m"             "death_m_age"        
+#>  [17] "prepreg_weight"      "prepreg_weight_mes"  "prepreg_weight_ga"   "latepreg_weight"    
+#>  [21] "latepreg_weight_mes" "latepreg_weight_ga"  "preg_gain"           "preg_gain_mes"      
+#>  [25] "height_m"            "height_mes_m"        "prepreg_dia"         "preg_dia"           
+#>  [29] "preg_thyroid"        "preg_fever"          "preeclam"            "preg_ht"            
+#>  [33] "asthma_m"            "prepreg_psych"       "preg_psych"          "ppd"                
+#>  [37] "prepreg_smk"         "prepreg_cig"         "preg_smk"            "preg_cig"           
+#>  [41] "prepreg_alc"         "prepreg_alc_unit"    "preg_alc"            "preg_alc_unit"      
+#>  [45] "folic_prepreg"       "folic_preg12"        "folic_post12"        "parity_m"           
+#>  [49] "preg_plan"           "mar"                 "ivf"                 "outcome"            
+#>  [53] "mode_delivery"       "plac_abrup"          "cob_p"               "cob_p_fath"         
+#>  [57] "ethn1_p"             "ethn2_p"             "ethn3_p"             "ethn_p_fath"        
+#>  [61] "agebirth_p_y"        "agebirth_p_d"        "agebirth_p_fath"     "death_p"            
+#>  [65] "death_p_age"         "death_p_fath"        "weight_f1"           "weight_mes_f1"      
+#>  [69] "weight_f1_fath"      "height_f1"           "height_mes_f1"       "height_f1_fath"     
+#>  [73] "dia_bf"              "asthma_bf"           "psych_bf"            "smk_p"              
+#>  [77] "smk_cig_p"           "smk_fath"            "birth_month"         "birth_year"         
+#>  [81] "apgar"               "neo_unit"            "sex"                 "plurality"          
+#>  [85] "ga_lmp"              "ga_us"               "ga_mr"               "ga_bj"              
+#>  [89] "birth_weight"        "birth_length"        "birth_head_circum"   "weight_who_ga"      
+#>  [93] "plac_weight"         "con_anomalies"       "major_con_anomalies" "cer_palsy"          
+#>  [97] "sibling_pos"         "death_child"         "death_child_age"     "breastfed_excl"     
+#> [101] "breastfed_any"       "breastfed_ever"      "solid_food"          "childcare_intro"    
+#> [105] "cats_preg"           "dogs_preg"           "cats_quant_preg"     "dogs_quant_preg"
 ```
 
 #### Assign data at login time
@@ -274,7 +370,8 @@ ds.reShape(
 # show the reshaped columns of the new data frame
 ds.colnames("core_yearlyrep_1_3_wide", datasources = conns)
 #> $armadillo
-#>  [1] "child_id" "pets_.0"  "cats_.0"  "dogs_.0"  "pets_.1"  "cats_.1"  "dogs_.1"  "pets_.2"  "cats_.2"  "dogs_.2"
+#>  [1] "child_id" "pets_.0"  "cats_.0"  "dogs_.0"  "pets_.1"  "cats_.1"  "dogs_.1"  "pets_.2"  "cats_.2" 
+#> [10] "dogs_.2"
 ```
 
 When you reshaped and subsetted the data you often need to merge your dataframe
@@ -304,30 +401,36 @@ ds.merge(
 ```r
 ds.colnames("analysis_df", datasources = conns)
 #> $armadillo
-#>   [1] "child_id"            "row_id"              "mother_id"           "cohort_id"           "preg_no"            
-#>   [6] "child_no"            "coh_country"         "recruit_age"         "cob_m"               "ethn1_m"            
-#>  [11] "ethn2_m"             "ethn3_m"             "agebirth_m_y"        "agebirth_m_d"        "death_m"            
-#>  [16] "death_m_age"         "prepreg_weight"      "prepreg_weight_mes"  "prepreg_weight_ga"   "latepreg_weight"    
-#>  [21] "latepreg_weight_mes" "latepreg_weight_ga"  "preg_gain"           "preg_gain_mes"       "height_m"           
-#>  [26] "height_mes_m"        "prepreg_dia"         "preg_dia"            "preg_thyroid"        "preg_fever"         
-#>  [31] "preeclam"            "preg_ht"             "asthma_m"            "prepreg_psych"       "preg_psych"         
-#>  [36] "ppd"                 "prepreg_smk"         "prepreg_cig"         "preg_smk"            "preg_cig"           
-#>  [41] "prepreg_alc"         "prepreg_alc_unit"    "preg_alc"            "preg_alc_unit"       "folic_prepreg"      
-#>  [46] "folic_preg12"        "folic_post12"        "parity_m"            "preg_plan"           "mar"                
-#>  [51] "ivf"                 "outcome"             "mode_delivery"       "plac_abrup"          "cob_p"              
-#>  [56] "cob_p_fath"          "ethn1_p"             "ethn2_p"             "ethn3_p"             "ethn_p_fath"        
-#>  [61] "agebirth_p_y"        "agebirth_p_d"        "agebirth_p_fath"     "death_p"             "death_p_age"        
-#>  [66] "death_p_fath"        "weight_f1"           "weight_mes_f1"       "weight_f1_fath"      "height_f1"          
-#>  [71] "height_mes_f1"       "height_f1_fath"      "dia_bf"              "asthma_bf"           "psych_bf"           
-#>  [76] "smk_p"               "smk_cig_p"           "smk_fath"            "birth_month"         "birth_year"         
-#>  [81] "apgar"               "neo_unit"            "sex"                 "plurality"           "ga_lmp"             
-#>  [86] "ga_us"               "ga_mr"               "ga_bj"               "birth_weight"        "birth_length"       
-#>  [91] "birth_head_circum"   "weight_who_ga"       "plac_weight"         "con_anomalies"       "major_con_anomalies"
-#>  [96] "cer_palsy"           "sibling_pos"         "death_child"         "death_child_age"     "breastfed_excl"     
-#> [101] "breastfed_any"       "breastfed_ever"      "solid_food"          "childcare_intro"     "cats_preg"          
-#> [106] "dogs_preg"           "cats_quant_preg"     "dogs_quant_preg"     "pets_.0"             "cats_.0"            
-#> [111] "dogs_.0"             "pets_.1"             "cats_.1"             "dogs_.1"             "pets_.2"            
-#> [116] "cats_.2"             "dogs_.2"
+#>   [1] "child_id"            "row_id"              "mother_id"           "cohort_id"          
+#>   [5] "preg_no"             "child_no"            "coh_country"         "recruit_age"        
+#>   [9] "cob_m"               "ethn1_m"             "ethn2_m"             "ethn3_m"            
+#>  [13] "agebirth_m_y"        "agebirth_m_d"        "death_m"             "death_m_age"        
+#>  [17] "prepreg_weight"      "prepreg_weight_mes"  "prepreg_weight_ga"   "latepreg_weight"    
+#>  [21] "latepreg_weight_mes" "latepreg_weight_ga"  "preg_gain"           "preg_gain_mes"      
+#>  [25] "height_m"            "height_mes_m"        "prepreg_dia"         "preg_dia"           
+#>  [29] "preg_thyroid"        "preg_fever"          "preeclam"            "preg_ht"            
+#>  [33] "asthma_m"            "prepreg_psych"       "preg_psych"          "ppd"                
+#>  [37] "prepreg_smk"         "prepreg_cig"         "preg_smk"            "preg_cig"           
+#>  [41] "prepreg_alc"         "prepreg_alc_unit"    "preg_alc"            "preg_alc_unit"      
+#>  [45] "folic_prepreg"       "folic_preg12"        "folic_post12"        "parity_m"           
+#>  [49] "preg_plan"           "mar"                 "ivf"                 "outcome"            
+#>  [53] "mode_delivery"       "plac_abrup"          "cob_p"               "cob_p_fath"         
+#>  [57] "ethn1_p"             "ethn2_p"             "ethn3_p"             "ethn_p_fath"        
+#>  [61] "agebirth_p_y"        "agebirth_p_d"        "agebirth_p_fath"     "death_p"            
+#>  [65] "death_p_age"         "death_p_fath"        "weight_f1"           "weight_mes_f1"      
+#>  [69] "weight_f1_fath"      "height_f1"           "height_mes_f1"       "height_f1_fath"     
+#>  [73] "dia_bf"              "asthma_bf"           "psych_bf"            "smk_p"              
+#>  [77] "smk_cig_p"           "smk_fath"            "birth_month"         "birth_year"         
+#>  [81] "apgar"               "neo_unit"            "sex"                 "plurality"          
+#>  [85] "ga_lmp"              "ga_us"               "ga_mr"               "ga_bj"              
+#>  [89] "birth_weight"        "birth_length"        "birth_head_circum"   "weight_who_ga"      
+#>  [93] "plac_weight"         "con_anomalies"       "major_con_anomalies" "cer_palsy"          
+#>  [97] "sibling_pos"         "death_child"         "death_child_age"     "breastfed_excl"     
+#> [101] "breastfed_any"       "breastfed_ever"      "solid_food"          "childcare_intro"    
+#> [105] "cats_preg"           "dogs_preg"           "cats_quant_preg"     "dogs_quant_preg"    
+#> [109] "pets_.0"             "cats_.0"             "dogs_.0"             "pets_.1"            
+#> [113] "cats_.1"             "dogs_.1"             "pets_.2"             "cats_.2"            
+#> [117] "dogs_.2"
 ```
 
 ### Save your work
@@ -433,14 +536,15 @@ ds.histogram(x = "core_nonrep$coh_country", datasources = conns)
 
 ```
 #> $breaks
-#>  [1]  35.31138 116.38319 197.45500 278.52680 359.59861 440.67042 521.74222 602.81403 683.88584 764.95764 846.02945
+#>  [1]  35.31138 116.38319 197.45500 278.52680 359.59861 440.67042 521.74222 602.81403 683.88584 764.95764
+#> [11] 846.02945
 #> 
 #> $counts
 #>  [1] 106 101  92 103 106 104 105 101 113  69
 #> 
 #> $density
-#>  [1] 0.0013074829 0.0012458092 0.0011347965 0.0012704787 0.0013074829 0.0012828134 0.0012951481 0.0012458092 0.0013938261
-#> [10] 0.0008510974
+#>  [1] 0.0013074829 0.0012458092 0.0011347965 0.0012704787 0.0013074829 0.0012828134 0.0012951481
+#>  [8] 0.0012458092 0.0013938261 0.0008510974
 #> 
 #> $mids
 #>  [1]  75.84729 156.91909 237.99090 319.06271 400.13451 481.20632 562.27813 643.34993 724.42174 805.49355

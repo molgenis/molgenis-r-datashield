@@ -38,6 +38,7 @@ methods::setMethod(
   "dsGetInfo", "ArmadilloResult",
   function(dsObj, ...) { # nolint
     if (dsObj@rval$async) {
+
       .retry_until_last_result(dsObj@conn)
       result <- httr::GET(
         handle = dsObj@conn@handle,
