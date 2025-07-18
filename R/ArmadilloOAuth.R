@@ -10,6 +10,7 @@
 #'
 #' @export
 armadillo.get_token <- function(server) { # nolint
+  lifecycle::deprecate_warn("3.0.0", "armadillo.get_token()", "armadillo.get_credentials()")
   credentials <- armadillo.get_credentials(server)
   return(credentials@id_token)
 }
@@ -53,6 +54,21 @@ setClass(
 #' @return The credentials
 #' @importFrom MolgenisAuth discover device_flow_auth
 #' @importFrom methods new
+#' @examples
+#' \dontrun{
+#' example_url <- "https://armadillo.example.org"
+#' credentials <- armadillo.get_credentials(example_url)
+#'
+#' builder <- newDSLoginBuilder()
+#' builder$append(
+#'   url = example_url,
+#'   server = "example_server",
+#'   token = credentials@access_token,
+#'   driver = "ArmadilloDriver")
+#' logindata <- builder$build()
+#'
+#' conns <- datashield.login(logins = logindata, assign = FALSE)
+#' }
 #' @export
 armadillo.get_credentials <- function(server) { # nolint
   auth_info <- .get_oauth_info(server)$auth

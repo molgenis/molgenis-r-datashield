@@ -43,9 +43,10 @@ Imports:
     stringr,
     utils,
     base64enc,
-    urltools, 
-    dplyr, 
-    jsonlite
+    urltools,
+    dplyr,
+    jsonlite,
+    lifecycle
 Suggests:
     dsBaseClient (>= 6.0),
     knitr,

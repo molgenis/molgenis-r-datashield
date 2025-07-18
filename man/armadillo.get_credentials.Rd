@@ -25,3 +25,19 @@ token to the connection and credentials objects in the global environment. For t
 correctly, ensure that there only exists one DataSHIELD connections object in the global
 environment, and that for each datasource there is only object containing their credentials.
 }
+\examples{
+\dontrun{
+example_url <- "https://armadillo.example.org"
+credentials <- armadillo.get_credentials(example_url)
+
+builder <- newDSLoginBuilder()
+builder$append(
+  url = example_url,
+  server = "example_server",
+  token = credentials@access_token,
+  driver = "ArmadilloDriver")
+logindata <- builder$build()
+
+conns <- datashield.login(logins = logindata, assign = FALSE)
+}
+}
