@@ -178,3 +178,6 @@
     c()
   }
 }
+
+## Needed to mock base function in tests
+deparse <- NULL

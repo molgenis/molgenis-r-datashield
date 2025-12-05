@@ -103,8 +103,46 @@ test_that(".unlist_character_list unnests list", {
   )
 })
 
-test_that(".deparse deparses vectors", {
-  skip("I still don't get the .deparse arguments")
+test_that(".deparse deparses simple calls to a single string", {
+  expr <- quote(a + b * 2)
+
+  result <- .deparse(expr)
+
+  expect_type(result, "character")
+  expect_length(result, 1L)
+  # For simple expressions, .deparse should just match base::deparse collapsed
+  expect_equal(result, paste(deparse(expr), collapse = "\n"))
+})
+
+test_that(".deparse collapses multi-line deparse output with newlines", {
+  expr <- quote(some_really_long_function_name(arg1, arg2, arg3))
+
+  # Force deparse() to behave as if it produced multiple lines,
+  # independent of the actual R version's formatting
+  with_mocked_bindings({
+    result <- .deparse(expr)
+  },
+  deparse = function(e) c("line1 <- part1", "line2 <- part2")
+  )
+
+  expect_identical(result, "line1 <- part1\nline2 <- part2")
+})
+
+test_that(".deparse returns character input unchanged", {
+  expr <- "already a character vector"
+
+  result <- .deparse(expr)
+
+  expect_identical(result, expr)
+})
+
+test_that(".deparse errors for non-language, non-character input", {
+  expr <- 42
+
+  expect_error(
+    .deparse(expr),
+    "Invalid expression"
+  )
 })
 
 test_that(".retry_until_last_result handles 404 by retrieving lastcommand", {
