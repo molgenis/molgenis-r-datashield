@@ -2,15 +2,3 @@
 .Rhistory
 .RData
 .Ruserdata
-*.so
-*.o
-*.dll
-*.html
-*.Rproj
-figure
-.RData
-inst/doc
-vignettes/*.R
-Meta
-doc
-docs
