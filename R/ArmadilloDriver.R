@@ -1,4 +1,3 @@
-
 #' Class ArmadilloDriver with constructor armadillo
 #'
 #' An Armadillo DataSHIELD Service Driver implementing the DataSHIELD Interface
@@ -43,33 +42,34 @@ armadillo <- function() {
 #' @importMethodsFrom DSI dsConnect
 #' @importFrom base64enc base64encode
 #' @importFrom stringr str_length str_remove_all
+#' @importFrom httr cookies POST handle add_headers
 #' @export
 methods::setMethod(
   "dsConnect", "ArmadilloDriver",
   function(drv, name, restore = NULL, username = "", password = "",
            token = "", url, profile = "default", opts = list(), ...) {
-    handle <- httr::handle(url)
+    handle <- handle(url)
 
-    if (stringr::str_length(username) > 0) {
-      if (stringr::str_length(password) == 0) {
+    if (str_length(username) > 0) {
+      if (str_length(password) == 0) {
         stop("Please provide a password with the username")
       }
       encoded <- base64enc::base64encode(
         charToRaw(paste0(username, ":", password))
       )
       auth_header <-
-        httr::add_headers("Authorization" = paste0("Basic ", encoded))
+        add_headers("Authorization" = paste0("Basic ", encoded))
     } else {
-      if (stringr::str_length(token) == 0) {
+      if (str_length(token) == 0) {
         stop("Please provide a token or a username / password combination")
       }
       auth_header <-
-        httr::add_headers("Authorization" = paste0("Bearer ", token))
+        add_headers("Authorization" = paste0("Bearer ", token))
     }
 
     profile_to_select <- if (profile == "") "default" else profile
 
-    response <- httr::POST(
+    response <- POST(
       handle = handle,
       path = "/select-profile",
       body = profile_to_select,
@@ -79,11 +79,10 @@ methods::setMethod(
     if (response$status == 404 && profile_to_select != "default") {
       stop(paste0("Profile not found: '", profile, "'"))
     }
-    cookies <- httr::cookies(response)
+    cookies <- cookies(response)
 
-    # Restore users workspace
     if (!is.null(restore)) {
-      restore_response <- httr::POST(
+      restore_response <- POST(
         handle = handle,
         query = list(id = restore),
         path = "/load-workspace",
@@ -93,11 +92,11 @@ methods::setMethod(
     }
 
     methods::new("ArmadilloConnection",
-      name = name,
-      handle = handle,
-      user = username,
-      cookies = cookies,
-      token = token
+                 name = name,
+                 handle = handle,
+                 user = username,
+                 cookies = cookies,
+                 token = token
     )
   }
 )

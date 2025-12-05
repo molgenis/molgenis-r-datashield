@@ -1,6 +1,6 @@
 Package: DSMolgenisArmadillo
 Type: Package
-Version: 3.0.1
+Version: 3.0.2
 Title: 'DataSHIELD' Client for 'MOLGENIS Armadillo'
 Description: 'DataSHIELD' is an infrastructure and series of R packages that 
     enables the remote and 'non-disclosive' analysis of sensitive research data.
@@ -46,20 +46,20 @@ Imports:
     urltools,
     dplyr,
     jsonlite,
-    lifecycle
+    lifecycle,
+    tibble
 Suggests:
     dsBaseClient (>= 6.0),
     knitr,
     mockery,
     testthat (>= 2.1.0),
-    tibble,
     rmarkdown,
     metafor
 License: LGPL (>= 2.1)
 URL: https://github.com/molgenis/molgenis-r-datashield/,
   https://molgenis.github.io/molgenis-r-datashield/
 BugReports: https://github.com/molgenis/molgenis-r-datashield/issues/
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 VignetteBuilder: knitr
 Encoding: UTF-8
 Collate: 

@@ -12,12 +12,12 @@
 #'
 #' @noRd
 .handle_last_command_error <- function(conn) {
-  command <- httr::GET(
+  command <- GET(
     handle = conn@handle,
     path = "/lastcommand",
-    config = httr::add_headers(.get_auth_header(conn))
+    config = add_headers(.get_auth_header(conn))
   )
-    json_returned <- httr::content(command)
+    json_returned <- content(command)
 
     if(command$status == 404) {json_returned <- list(status = "404")}
     if (json_returned$status == "FAILED") {
@@ -48,12 +48,12 @@
 #' @noRd
 .handle_request_error <- function(response) {
   if (response$status_code == 400) {
-    json_content <- httr::content(response)
+    json_content <- content(response)
     stop(paste0("Bad request: ", json_content$message), call. = FALSE)
   } else if (response$status_code == 401) {
     stop("Unauthorized", call. = FALSE)
   } else if (response$status_code == 500) {
-    json_content <- httr::content(response, "text")
+    json_content <- content(response, "text")
     stop(paste0("Internal server error: ", json_content), call. = FALSE)
   }
 }
@@ -87,16 +87,16 @@
 #'
 #' @param conn HTTR connection
 #'
-#' @importFrom httr content add_headers
+#' @importFrom httr content add_headers RETRY
 #'
 #' @noRd
 .retry_until_last_result <- function(conn) {
-  response <- httr::RETRY(
+  response <- RETRY(
     verb = "GET",
     handle = conn@handle,
     path = "/lastresult",
     terminate_on = c(200, 404, 401),
-    config = httr::add_headers(c("Accept" = "application/octet-stream",
+    config = add_headers(c("Accept" = "application/octet-stream",
                                  .get_auth_header(conn)))
   )
 
@@ -105,7 +105,7 @@
   if (response$status_code == 404) {
     .handle_last_command_error(conn)
   } else {
-    content <- httr::content(response)
+    content <- content(response)
     if (is.null(content)) {
       NULL
     } else {
@@ -178,3 +178,6 @@
     c()
   }
 }
+
+## Needed to mock base function in tests
+deparse <- NULL

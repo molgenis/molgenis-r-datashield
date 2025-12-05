@@ -1,3 +1,6 @@
+# DSMolgenisArmadillo 3.0.2
+Switched test mocking to `with_mocked_bindings` as `with_mock` is now depricated.
+
 # DSMolgenisArmadillo 3.0.1
 Fix: fixed failing tests
 

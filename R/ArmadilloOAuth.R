@@ -29,15 +29,14 @@ armadillo.get_token <- function(server) { # nolint
 setClass(
   "ArmadilloCredentials",
   slots = list(
-    access_token = "character",
-    expires_in = "numeric",
-    expires_at = "POSIXct",
-    id_token = "character",
+    access_token  = "character",
+    expires_in    = "numeric",
+    expires_at    = "POSIXct",
+    id_token      = "character",
     refresh_token = "character",
-    token_type = "character",
-    auth_type = "character")
+    token_type    = "character",
+    auth_type     = "character")
 )
-
 
 #' Get credentials information
 #'
@@ -71,20 +70,22 @@ setClass(
 #' }
 #' @export
 armadillo.get_credentials <- function(server) { # nolint
-  auth_info <- .get_oauth_info(server)$auth
-  endpoint <- discover(auth_info$issuerUri)
+  auth_info   <- .get_oauth_info(server)$auth
+  endpoint    <- discover(auth_info$issuerUri)
   credentials <- device_flow_auth(
     endpoint,
     auth_info$clientId
   )
 
-  credentials_obj <- new("ArmadilloCredentials",  access_token = credentials$access_token,
-                         expires_in =  credentials$expires_in,
-                         expires_at = Sys.time() + credentials$expires_in,
-                         id_token =  credentials$id_token,
-                         refresh_token =  credentials$refresh_token,
-                         token_type =  credentials$token_type,
-                         auth_type = ifelse(grepl("realms", endpoint$authorize), "keycloak", "fusionauth")
+  credentials_obj <- new(
+    "ArmadilloCredentials",
+    access_token  = credentials$access_token,
+    expires_in    = credentials$expires_in,
+    expires_at    = Sys.time() + credentials$expires_in,
+    id_token      = credentials$id_token,
+    refresh_token = credentials$refresh_token,
+    token_type    = credentials$token_type,
+    auth_type     = ifelse(grepl("realms", endpoint$authorize), "keycloak", "fusionauth")
   )
 
   return(credentials_obj)
@@ -106,63 +107,69 @@ armadillo.get_credentials <- function(server) { # nolint
   # get auth url
   auth_info <- .get_oauth_info(server)
 
-if(credentials@auth_type == "fusionauth") {
+  if (credentials@auth_type == "fusionauth") {
 
-  # post to fusionauth refresh endpoint with current access/refresh tokens
-  fusionAuthRefreshUri <- paste0(auth_info$auth$issuerUri, "/api/jwt/refresh")
-  response <- httr::POST(
-    url = fusionAuthRefreshUri,
-    handle=handle(''),
-    config=httr::set_cookies(refresh_token=credentials@refresh_token, access_token=credentials@access_token)
+    # post to fusionauth refresh endpoint with current access/refresh tokens
+    fusionAuthRefreshUri <- paste0(auth_info$auth$issuerUri, "/api/jwt/refresh")
+    response <- POST(
+      url    = fusionAuthRefreshUri,
+      handle = handle(""),
+      config = set_cookies(
+        refresh_token = credentials@refresh_token,
+        access_token  = credentials@access_token
+      )
     )
 
-  content <- content(response)
+    content <- content(response)
 
-  if (!is.null(content$fieldErrors)){
-    stop(paste0(" ", unlist(content$fieldErrors)))
-  } else if (is.null(content$token)) {
-    stop("Refresh failed")
-  }
+    if (!is.null(content$fieldErrors)) {
+      stop(paste0(" ", unlist(content$fieldErrors)))
+    } else if (is.null(content$token)) {
+      stop("Refresh failed")
+    }
 
-  new_credentials <- new("ArmadilloCredentials",
-                         access_token = content$token,
-                         expires_in = as.numeric(.get_updated_expiry_date(auth_info, content$token) - Sys.time()),
-                         expires_at = .get_updated_expiry_date(auth_info, content$token),
-                         id_token = credentials@id_token,
-                         refresh_token = content$refreshToken,
-                         token_type = credentials@token_type,
-                         auth_type = credentials@auth_type)
+    new_credentials <- new(
+      "ArmadilloCredentials",
+      access_token  = content$token,
+      expires_in    = as.numeric(.get_updated_expiry_date(auth_info, content$token) - Sys.time()),
+      expires_at    = .get_updated_expiry_date(auth_info, content$token),
+      id_token      = credentials@id_token,
+      refresh_token = content$refreshToken,
+      token_type    = credentials@token_type,
+      auth_type     = credentials@auth_type
+    )
 
-} else {
-  keyCloakRefreshUri <- paste0(auth_info$auth$issuerUri, "/protocol/openid-connect/token")
-  response <- httr::POST(
-    url = keyCloakRefreshUri,
-    body = list(
-      grant_type = "refresh_token",
+  } else {
+    keyCloakRefreshUri <- paste0(auth_info$auth$issuerUri, "/protocol/openid-connect/token")
+    response <- POST(
+      url   = keyCloakRefreshUri,
+      body  = list(
+        grant_type    = "refresh_token",
+        refresh_token = credentials@refresh_token,
+        client_id     = auth_info$auth$clientId
+      ),
+      encode = "form"
+    )
+
+    content <- content(response)
+
+    if (!is.null(content$fieldErrors)) {
+      stop(paste0(" ", unlist(content$fieldErrors)))
+    } else if (is.null(content$access_token)) {
+      stop("Refresh failed")
+    }
+
+    new_credentials <- new(
+      "ArmadilloCredentials",
+      access_token  = content$access_token,
+      expires_in    = content$expires_in,
+      expires_at    = Sys.time() + content$expires_in,
+      id_token      = credentials@id_token,
       refresh_token = credentials@refresh_token,
-      client_id = auth_info$auth$clientId
-    ),
-    encode = "form"
-  )
-
-  content <- content(response)
-
-  if (!is.null(content$fieldErrors)){
-    stop(paste0(" ", unlist(content$fieldErrors)))
-  } else if (is.null(content$access_token)) {
-    stop("Refresh failed")
+      token_type    = credentials@token_type,
+      auth_type     = credentials@auth_type
+    )
   }
-
-  new_credentials <- new("ArmadilloCredentials",
-                          access_token = content$access_token,
-                          expires_in = content$expires_in,
-                          expires_at = Sys.time() + content$expires_in,
-                          id_token = credentials@id_token,
-                          refresh_token = credentials@refresh_token,
-                          token_type = credentials@token_type,
-                          auth_type = credentials@auth_type)
-
-}
 
   message("Refresh successful")
   return(new_credentials)
@@ -174,17 +181,18 @@ if(credentials@auth_type == "fusionauth") {
 #' and return the updated expiry time of the JWT access token.
 #'
 #' @param auth_info A list containing authentication metadata, including `auth$issuerUri`.
-#' @param credentials An object with an `@access_token` slot containing the JWT.
+#' @param token A JWT access token.
 #'
 #' @return A POSIXct object representing the token's expiry time.
 #' @keywords internal
+#' @importFrom httr GET add_headers content
 #' @noRd
 .get_updated_expiry_date <- function(auth_info, token) {
   validate_url <- paste0(auth_info$auth$issuerUri, "/api/jwt/validate")
-  response <- httr::GET(
+  response <- GET(
     url = validate_url,
-    httr::add_headers(Authorization = paste("Bearer", token))
-    )
+    add_headers(Authorization = paste("Bearer", token))
+  )
   return(as.POSIXct(content(response)$jwt$exp))
 }
 
@@ -205,9 +213,9 @@ if(credentials@auth_type == "fusionauth") {
 .get_oauth_info <- function(armadillo_server) {
   info_url <- armadillo_server
   urltools::path(info_url) <- "actuator/info"
-  response <- httr::GET(info_url)
-  httr::stop_for_status(response, task = "fetch server info")
-  return(httr::content(response))
+  response <- GET(info_url)
+  stop_for_status(response, task = "fetch server info")
+  return(content(response))
 }
 
 #' @title Reset Armadillo Token if Expired with tryCatch
