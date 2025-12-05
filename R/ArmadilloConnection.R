@@ -1,5 +1,6 @@
 #' @include ArmadilloDriver.R
-
+#' @importFrom httr POST GET DELETE HEAD RETRY content
+#' @importFrom tibble tibble
 setOldClass("handle")
 
 #' Class ArmadilloConnection.
@@ -17,14 +18,14 @@ setOldClass("handle")
 #' @export
 #' @keywords internal
 methods::setClass("ArmadilloConnection",
-  contains = "DSConnection",
-  slots = list(
-    name = "character",
-    handle = "handle",
-    user = "character",
-    cookies = "list",
-    token = "character"
-  )
+                  contains = "DSConnection",
+                  slots = list(
+                    name = "character",
+                    handle = "handle",
+                    user = "character",
+                    cookies = "list",
+                    token = "character"
+                  )
 )
 
 #' Disconnect from an Armadillo DataSHIELD Service
@@ -45,14 +46,14 @@ methods::setMethod(
   "dsDisconnect", "ArmadilloConnection",
   function(conn, save = NULL) {
     if (!is.null(save)) {
-      response <- httr::POST(
+      response <- POST(
         handle = conn@handle,
         path = paste0("/workspaces/", save),
         config = httr::add_headers(.get_auth_header(conn))
       )
       .handle_request_error(response)
     }
-    httr::POST(
+    POST(
       handle = conn@handle,
       path = "/logout",
       config = httr::add_headers(.get_auth_header(conn))
@@ -65,7 +66,7 @@ methods::setMethod(
 
     conn <- .refresh_token_safely(conn)
 
-    response <- httr::GET(
+    response <- GET(
       handle = conn@handle,
       path = "/profiles",
       config = httr::add_headers(.get_auth_header(conn))
@@ -75,7 +76,7 @@ methods::setMethod(
       # endpoint not implemented, fake it!
       list(available = "default", current = "default")
     } else {
-      httr::content(response)
+      content(response)
     }
   }
 )
@@ -97,13 +98,13 @@ methods::setMethod(
 
     conn <- .refresh_token_safely(conn)
 
-    response <- httr::GET(
+    response <- GET(
       handle = conn@handle,
       path = "/tables",
       config = httr::add_headers(.get_auth_header(conn))
     )
     .handle_request_error(response)
-    .unlist_character_list(httr::content(response))
+    .unlist_character_list(content(response))
   }
 )
 
@@ -122,7 +123,7 @@ methods::setMethod(
 
     conn <- .refresh_token_safely(conn)
 
-    response <- httr::HEAD(
+    response <- HEAD(
       handle = conn@handle,
       path = paste0("/tables/", table),
       config = httr::add_headers(.get_auth_header(conn))
@@ -151,13 +152,13 @@ methods::setMethod(
 
     conn <- .refresh_token_safely(conn)
 
-    response <- httr::GET(
+    response <- GET(
       handle = conn@handle,
       path = "/resources",
       config = httr::add_headers(.get_auth_header(conn))
     )
     .handle_request_error(response)
-    .unlist_character_list(httr::content(response))
+    .unlist_character_list(content(response))
   }
 )
 
@@ -175,7 +176,7 @@ methods::setMethod(
 
     conn <- .refresh_token_safely(conn)
 
-    response <- httr::HEAD(
+    response <- HEAD(
       handle = conn@handle,
       path = paste0("/resources/", resource),
       config = httr::add_headers(.get_auth_header(conn))
@@ -234,13 +235,13 @@ methods::setMethod(
 
     conn <- .refresh_token_safely(conn)
 
-    response <- httr::GET(
+    response <- GET(
       handle = conn@handle,
       path = "/symbols",
       config = httr::add_headers(.get_auth_header(conn))
     )
     .handle_request_error(response)
-    .unlist_character_list(httr::content(response))
+    .unlist_character_list(content(response))
   }
 )
 
@@ -261,7 +262,7 @@ methods::setMethod(
 
     conn <- .refresh_token_safely(conn)
 
-    response <- httr::DELETE(
+    response <- DELETE(
       handle = conn@handle,
       path = paste0("/symbols/", symbol),
       config = httr::add_headers(.get_auth_header(conn))
@@ -298,7 +299,7 @@ methods::setMethod(
 
     conn <- .refresh_token_safely(conn)
 
-    response <- httr::POST(
+    response <- POST(
       handle = conn@handle,
       path = "/load-table",
       query = query,
@@ -313,8 +314,8 @@ methods::setMethod(
       result <- .retry_until_last_result(conn)
     }
     methods::new("ArmadilloResult",
-      conn = conn,
-      rval = list(result = result, async = async)
+                 conn = conn,
+                 rval = list(result = result, async = async)
     )
   }
 )
@@ -341,7 +342,7 @@ methods::setMethod(
 
     conn <- .refresh_token_safely(conn)
 
-    response <- httr::POST(
+    response <- POST(
       handle = conn@handle,
       path = "/load-resource",
       query = query,
@@ -357,8 +358,8 @@ methods::setMethod(
     }
 
     methods::new("ArmadilloResult",
-      conn = conn,
-      rval = list(result = result, async = async)
+                 conn = conn,
+                 rval = list(result = result, async = async)
     )
   }
 )
@@ -382,13 +383,13 @@ methods::setMethod(
 
     conn <- .refresh_token_safely(conn)
 
-    response <- httr::GET(
+    response <- GET(
       handle = conn@handle,
       path = paste0("/methods/", type),
       config = httr::add_headers(.get_auth_header(conn))
     )
     .handle_request_error(response)
-    df <- .list_to_data_frame(httr::content(response))
+    df <- .list_to_data_frame(content(response))
     df <- .fill_column(df, "type", type)
     df <- .fill_column(df, "class", "function")
     df <- .rename_column(df, "function", "value")
@@ -411,7 +412,7 @@ methods::setMethod(
 
     conn <- .refresh_token_safely(conn)
 
-    response <- httr::GET(
+    response <- GET(
       handle = conn@handle,
       path = "/packages",
       config = httr::add_headers(.get_auth_header(conn))
@@ -419,7 +420,7 @@ methods::setMethod(
     .handle_request_error(response)
 
     extracted_cols <- lapply(
-      httr::content(response),
+      content(response),
       function(x) list(name = x$name, version = x$version)
     )
     .list_to_data_frame(extracted_cols)
@@ -442,14 +443,14 @@ methods::setMethod(
 
     conn <- .refresh_token_safely(conn)
 
-    response <- httr::GET(
+    response <- GET(
       handle = conn@handle,
       path = "/workspaces",
       config = httr::add_headers(.get_auth_header(conn))
     )
     .handle_request_error(response)
 
-    df <- .list_to_data_frame(httr::content(response))
+    df <- .list_to_data_frame(content(response))
     df <- .fill_column(df, "user", conn@user)
     df <- .rename_column(df, "lastModified", "lastAccessDate")
     df
@@ -471,7 +472,7 @@ methods::setMethod(
 
     conn <- .refresh_token_safely(conn)
 
-    response <- httr::POST(
+    response <- POST(
       handle = conn@handle,
       path = paste0("/workspaces/", name),
       config = httr::add_headers(.get_auth_header(conn))
@@ -495,7 +496,7 @@ methods::setMethod(
 
     conn <- .refresh_token_safely(conn)
 
-    response <- httr::DELETE(
+    response <- DELETE(
       handle = conn@handle,
       path = paste0("/workspaces/", name),
       config = httr::add_headers(.get_auth_header(conn))
@@ -527,7 +528,7 @@ methods::setMethod(
 
     conn <- .refresh_token_safely(conn)
 
-    response <- httr::POST(
+    response <- POST(
       handle = conn@handle,
       query = list(async = async),
       path = paste0("/symbols/", symbol),
@@ -545,11 +546,11 @@ methods::setMethod(
     }
 
     methods::new("ArmadilloResult",
-      conn = conn,
-      rval = list(
-        result = NULL,
-        async = async
-      )
+                 conn = conn,
+                 rval = list(
+                   result = NULL,
+                   async = async
+                 )
     )
   }
 )
@@ -574,7 +575,7 @@ methods::setMethod(
   function(conn, expr, async = TRUE) {
     conn <- .refresh_token_safely(conn)
 
-    response <- httr::POST(
+    response <- POST(
       handle = conn@handle,
       query = list(async = async),
       path = "/execute",
@@ -592,8 +593,8 @@ methods::setMethod(
     }
 
     methods::new("ArmadilloResult",
-      conn = conn,
-      rval = list(result = result, async = async)
+                 conn = conn,
+                 rval = list(result = result, async = async)
     )
   }
 )
@@ -619,13 +620,13 @@ methods::setMethod(
 methods::setMethod(
   "dsGetInfo", "ArmadilloConnection",
   function(dsObj, ...) { # nolint
-    response <- httr::GET(
+    response <- GET(
       handle = dsObj@handle,
       path = "/actuator/info",
       config = httr::add_headers(.get_auth_header(dsObj))
     )
     .handle_request_error(response)
-    result <- httr::content(response)
+    result <- content(response)
     result$url <- dsObj@handle$url
     result$name <- dsObj@name
     result$cookies <- dsObj@cookies
@@ -651,7 +652,7 @@ methods::setMethod(
 
     conn <- .refresh_token_safely(conn)
 
-    try(httr::GET(
+    try(GET(
       handle = conn@handle,
       path = "/actuator/info",
       config = httr::add_headers(.get_auth_header(conn))
