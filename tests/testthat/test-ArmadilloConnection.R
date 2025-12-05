@@ -1,9 +1,9 @@
 test_that("dsDisconnect calls /logout endpoint ", {
   post <- mock()
-  with_mock(
-    "httr::POST" = post,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    dsDisconnect(connection)
+  with_mocked_bindings(
+    dsDisconnect(connection),
+    "POST" = post,
+    ".refresh_token_safely" = function(conn) connection
   )
   expect_called(post, 1)
   expect_args(post, 1,
@@ -14,10 +14,10 @@ test_that("dsDisconnect calls /logout endpoint ", {
 
 test_that("dsDisconnect saves the workspace", {
   post <- mock(list(status_code = 200), cycle = TRUE)
-  with_mock(
-    "httr::POST" = post,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    dsDisconnect(connection, save = "keepit")
+  with_mocked_bindings(
+    dsDisconnect(connection, save = "keepit"),
+    "POST" = post,
+    ".refresh_token_safely" = function(conn) connection
   )
   expect_called(post, 2)
   expect_args(post, 1,
@@ -28,15 +28,15 @@ test_that("dsDisconnect saves the workspace", {
 
 test_that("dsListProfiles retrieves profiles", {
   profiles <- list(
-                   available = list("default", "exposome"),
-                   current = "exposome")
+    available = list("default", "exposome"),
+    current = "exposome")
   get <- mock(list(status_code = 200))
   content <- mock(profiles)
-  result <- with_mock(
-    "httr::GET" = get,
-    "httr::content" = content,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    dsListProfiles(connection)
+  result <- with_mocked_bindings(
+    dsListProfiles(connection),
+    "GET" = get,
+    "content" = content,
+    ".refresh_token_safely" = function(conn) connection
   )
   expect_args(get, 1,
               handle = handle,
@@ -49,11 +49,11 @@ test_that("dsListProfiles retrieves profiles", {
 test_that("dsListProfiles returns default result if none found", {
   get <- mock(list(status_code = 404))
   content <- mock(profiles)
-  result <- with_mock(
-    "httr::GET" = get,
-    "httr::content" = content,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    dsListProfiles(connection)
+  result <- with_mocked_bindings(
+    dsListProfiles(connection),
+    "GET" = get,
+    "content" = content,
+    ".refresh_token_safely" = function(conn) connection
   )
   expect_args(get, 1,
               handle = handle,
@@ -69,11 +69,11 @@ test_that("dsListTables retrieves tables", {
   tables <- list("a", "b")
   get <- mock(list(status_code = 200))
   content <- mock(tables)
-  result <- with_mock(
-    "httr::GET" = get,
-    "httr::content" = content,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    dsListTables(connection)
+  result <- with_mocked_bindings(
+    dsListTables(connection),
+    "GET" = get,
+    "content" = content,
+    ".refresh_token_safely" = function(conn) connection
   )
   expect_args(get, 1,
               handle = handle,
@@ -86,11 +86,11 @@ test_that("dsListResources retrieves resources", {
   resources <- list("a", "b")
   get <- mock(list(status_code = 200))
   content <- mock(resources)
-  result <- with_mock(
-    "httr::GET" = get,
-    "httr::content" = content,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    dsListResources(connection)
+  result <- with_mocked_bindings(
+    dsListResources(connection),
+    "GET" = get,
+    "content" = content,
+    ".refresh_token_safely" = function(conn) connection
   )
   expect_args(get, 1,
               handle = handle,
@@ -101,57 +101,57 @@ test_that("dsListResources retrieves resources", {
 
 test_that("dsHasTable returns TRUE if table exists", {
   head <- mock(list(status_code = 200))
-  with_mock(
-    "httr::HEAD" = head,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    expect_true(dsHasTable(connection, "project/folder/name.parquet"))
+  with_mocked_bindings(
+    expect_true(dsHasTable(connection, "project/folder/name.parquet")),
+    "HEAD" = head,
+    ".refresh_token_safely" = function(conn) connection
   )
   expect_args(head, 1,
-    handle = handle,
-    path = "/tables/project/folder/name.parquet",
-    config = httr::add_headers("Authorization" = "Bearer token")
+              handle = handle,
+              path = "/tables/project/folder/name.parquet",
+              config = httr::add_headers("Authorization" = "Bearer token")
   )
 })
 
 test_that("dsHasTable returns FALSE if table doesnot exist", {
   head <- mock(list(status_code = 404))
-  with_mock(
-    "httr::HEAD" = head,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    expect_false(dsHasTable(connection, "project/folder/name.parquet"))
+  with_mocked_bindings(
+    expect_false(dsHasTable(connection, "project/folder/name.parquet")),
+    "HEAD" = head,
+    ".refresh_token_safely" = function(conn) connection
   )
   expect_args(head, 1,
-    handle = handle,
-    path = "/tables/project/folder/name.parquet",
-    config = httr::add_headers("Authorization" = "Bearer token")
+              handle = handle,
+              path = "/tables/project/folder/name.parquet",
+              config = httr::add_headers("Authorization" = "Bearer token")
   )
 })
 
 test_that("dsHasResource returns TRUE if resource exists", {
   head <- mock(list(status_code = 200))
-  with_mock(
-    "httr::HEAD" = head,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    expect_true(dsHasResource(connection, "project/folder/name"))
+  with_mocked_bindings(
+    expect_true(dsHasResource(connection, "project/folder/name")),
+    "HEAD" = head,
+    ".refresh_token_safely" = function(conn) connection
   )
   expect_args(head, 1,
-    handle = handle,
-    path = "/resources/project/folder/name",
-    config = httr::add_headers("Authorization" = "Bearer token")
+              handle = handle,
+              path = "/resources/project/folder/name",
+              config = httr::add_headers("Authorization" = "Bearer token")
   )
 })
 
 test_that("dsHasResource returns FALSE if table doesnot exist", {
   head <- mock(list(status_code = 404))
-  with_mock(
-    "httr::HEAD" = head,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    expect_false(dsHasResource(connection, "project/folder/name"))
+  with_mocked_bindings(
+    expect_false(dsHasResource(connection, "project/folder/name")),
+    "HEAD" = head,
+    ".refresh_token_safely" = function(conn) connection
   )
   expect_args(head, 1,
-    handle = handle,
-    path = "/resources/project/folder/name",
-    config = httr::add_headers("Authorization" = "Bearer token")
+              handle = handle,
+              path = "/resources/project/folder/name",
+              config = httr::add_headers("Authorization" = "Bearer token")
   )
 })
 
@@ -171,11 +171,11 @@ test_that("dsListSymbols returns symbols", {
   symbols <- list("a", "b")
   get <- mock(list(status_code = 200))
   content <- mock(symbols)
-  result <- with_mock(
-    "httr::GET" = get,
-    "httr::content" = content,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    dsListSymbols(connection)
+  result <- with_mocked_bindings(
+    dsListSymbols(connection),
+    "GET" = get,
+    "content" = content,
+    ".refresh_token_safely" = function(conn) connection
   )
   expect_args(get, 1,
               handle = handle,
@@ -186,10 +186,10 @@ test_that("dsListSymbols returns symbols", {
 
 test_that("dsRmSymbol removes symbol", {
   delete <- mock(list(status_code = 200))
-  result <- with_mock(
-    "httr::DELETE" = delete,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    dsRmSymbol(connection, "D")
+  result <- with_mocked_bindings(
+    dsRmSymbol(connection, "D"),
+    "DELETE" = delete,
+    ".refresh_token_safely" = function(conn) connection
   )
   expect_args(delete, 1,
               handle = handle,
@@ -199,44 +199,44 @@ test_that("dsRmSymbol removes symbol", {
 
 test_that("dsAssignTable assigns table to symbol", {
   post <- mock(list(status_code = 200))
-  result <- with_mock(
-    "httr::POST" = post,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    dsAssignTable(connection, "D", "project/folder/name.parquet")
+  result <- with_mocked_bindings(
+    dsAssignTable(connection, "D", "project/folder/name.parquet"),
+    "POST" = post,
+    ".refresh_token_safely" = function(conn) connection
   )
   expect_args(post, 1,
-    handle = handle,
-    path = "/load-table",
-    query = list(
-      table = "project/folder/name.parquet",
-      symbol = "D",
-      async = TRUE
-    ),
-    config = httr::add_headers("Authorization" = "Bearer token")
+              handle = handle,
+              path = "/load-table",
+              query = list(
+                table = "project/folder/name.parquet",
+                symbol = "D",
+                async = TRUE
+              ),
+              config = httr::add_headers("Authorization" = "Bearer token")
   )
   expect_s4_class(result, "ArmadilloResult")
 })
 
 test_that("dsAssignTable allows variable selection", {
   post <- mock(list(status_code = 200))
-  result <- with_mock(
-    "httr::POST" = post,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
+  result <- with_mocked_bindings(
     dsAssignTable(connection, "D",
-      "project/folder/name.parquet",
-      variables = c("foo", "bar")
-    )
+                  "project/folder/name.parquet",
+                  variables = c("foo", "bar")
+    ),
+    "POST" = post,
+    ".refresh_token_safely" = function(conn) connection
   )
   expect_args(post, 1,
-    handle = handle,
-    path = "/load-table",
-    query = list(
-      table = "project/folder/name.parquet",
-      symbol = "D",
-      async = TRUE,
-      variables = "foo,bar"
-    ),
-    config = httr::add_headers("Authorization" = "Bearer token")
+              handle = handle,
+              path = "/load-table",
+              query = list(
+                table = "project/folder/name.parquet",
+                symbol = "D",
+                async = TRUE,
+                variables = "foo,bar"
+              ),
+              config = httr::add_headers("Authorization" = "Bearer token")
   )
   expect_s4_class(result, "ArmadilloResult")
 })
@@ -245,41 +245,41 @@ test_that("dsAssignTable, when called synchronously, waits for result", {
   post <- mock(list(status_code = 200))
   retry <- mock(list(status_code = 200))
   httr_content <- mock(NULL)
-  result <- with_mock(
-    "httr::POST" = post,
-    "httr::RETRY" = retry,
-    "httr::content" = httr_content,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    dsAssignTable(connection, "D", "project/folder/name.parquet")
+  result <- with_mocked_bindings(
+    dsAssignTable(connection, "D", "project/folder/name.parquet"),
+    "POST" = post,
+    "RETRY" = retry,
+    "content" = httr_content,
+    ".refresh_token_safely" = function(conn) connection
   )
   expect_args(post, 1,
-    handle = handle,
-    path = "/load-table",
-    query = list(
-      table = "project/folder/name.parquet", symbol = "D",
-      async = TRUE
-    ),
-    config = httr::add_headers("Authorization" = "Bearer token")
+              handle = handle,
+              path = "/load-table",
+              query = list(
+                table = "project/folder/name.parquet", symbol = "D",
+                async = TRUE
+              ),
+              config = httr::add_headers("Authorization" = "Bearer token")
   )
   expect_s4_class(result, "ArmadilloResult")
 })
 
 test_that("dsAssignResource assigns resource to symbol", {
   post <- mock(list(status_code = 200))
-  result <- with_mock(
-    "httr::POST" = post,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    dsAssignResource(connection, "D", "project/folder/name")
+  result <- with_mocked_bindings(
+    dsAssignResource(connection, "D", "project/folder/name"),
+    "POST" = post,
+    ".refresh_token_safely" = function(conn) connection
   )
   expect_args(post, 1,
-    handle = handle,
-    path = "/load-resource",
-    query = list(
-      resource = "project/folder/name",
-      symbol = "D",
-      async = TRUE
-    ),
-    config = httr::add_headers("Authorization" = "Bearer token")
+              handle = handle,
+              path = "/load-resource",
+              query = list(
+                resource = "project/folder/name",
+                symbol = "D",
+                async = TRUE
+              ),
+              config = httr::add_headers("Authorization" = "Bearer token")
   )
   expect_s4_class(result, "ArmadilloResult")
 })
@@ -288,21 +288,21 @@ test_that("dsAssignResource, when called synchronously, waits for result", {
   post <- mock(list(status_code = 200))
   retry <- mock(list(status_code = 200))
   httr_content <- mock(NULL)
-  result <- with_mock(
-    "httr::POST" = post,
-    "httr::RETRY" = retry,
-    "httr::content" = httr_content,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    dsAssignResource(connection, "D", "project/folder/name")
+  result <- with_mocked_bindings(
+    dsAssignResource(connection, "D", "project/folder/name"),
+    "POST" = post,
+    "RETRY" = retry,
+    "content" = httr_content,
+    ".refresh_token_safely" = function(conn) connection
   )
   expect_args(post, 1,
-    handle = handle,
-    path = "/load-resource",
-    query = list(
-      resource = "project/folder/name", symbol = "D",
-      async = TRUE
-    ),
-    config = httr::add_headers("Authorization" = "Bearer token")
+              handle = handle,
+              path = "/load-resource",
+              query = list(
+                resource = "project/folder/name", symbol = "D",
+                async = TRUE
+              ),
+              config = httr::add_headers("Authorization" = "Bearer token")
   )
   expect_s4_class(result, "ArmadilloResult")
 })
@@ -322,11 +322,11 @@ test_that("dsListMethods returns assign methods", {
   get <- mock(list(status_code = 200))
   content <- mock(methods)
 
-  result <- with_mock(
-    "httr::GET" = get,
-    "httr::content" = content,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    dsListMethods(connection, type = "assign")
+  result <- with_mocked_bindings(
+    dsListMethods(connection, type = "assign"),
+    "GET" = get,
+    "content" = content,
+    ".refresh_token_safely" = function(conn) connection
   )
 
   expect_args(get, 1,
@@ -361,11 +361,11 @@ test_that("dsListPackages extracts name and version from packages", {
   get <- mock(list(status_code = 200))
   content <- mock(packages)
 
-  result <- with_mock(
-    "httr::GET" = get,
-    "httr::content" = content,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    dsListPackages(connection)
+  result <- with_mocked_bindings(
+    dsListPackages(connection),
+    "GET" = get,
+    "content" = content,
+    ".refresh_token_safely" = function(conn) connection
   )
 
   expect_equivalent(result, tibble(
@@ -392,11 +392,11 @@ test_that("dsListWorkspaces lists workspaces", {
   get <- mock(list(status_code = 200))
   content <- mock(workspaces)
 
-  result <- with_mock(
-    "httr::GET" = get,
-    "httr::content" = content,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    dsListWorkspaces(connection)
+  result <- with_mocked_bindings(
+    dsListWorkspaces(connection),
+    "GET" = get,
+    "content" = content,
+    ".refresh_token_safely" = function(conn) connection
   )
 
   expect_equivalent(result, tibble(
@@ -417,68 +417,68 @@ test_that("dsListWorkspaces lists workspaces", {
 test_that("dsSaveWorkspace saves workspace", {
   post <- mock(list(status_code = 201))
 
-  with_mock(
-    "httr::POST" = post,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    dsSaveWorkspace(connection, "keepit")
+  with_mocked_bindings(
+    dsSaveWorkspace(connection, "keepit"),
+    "POST" = post,
+    ".refresh_token_safely" = function(conn) connection
   )
 
   expect_args(post, 1,
-    handle = handle,
-    path = "/workspaces/keepit",
-    config = httr::add_headers("Authorization" = "Bearer token")
+              handle = handle,
+              path = "/workspaces/keepit",
+              config = httr::add_headers("Authorization" = "Bearer token")
   )
 })
 
 test_that("dsRmWorkspace removes workspace", {
   delete <- mock(list(status_code = 204))
 
-  with_mock(
-    "httr::DELETE" = delete,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    dsRmWorkspace(connection, "keepit")
+  with_mocked_bindings(
+    dsRmWorkspace(connection, "keepit"),
+    "DELETE" = delete,
+    ".refresh_token_safely" = function(conn) connection
   )
 
   expect_args(delete, 1,
-    handle = handle,
-    path = "/workspaces/keepit",
-    config = httr::add_headers("Authorization" = "Bearer token")
+              handle = handle,
+              path = "/workspaces/keepit",
+              config = httr::add_headers("Authorization" = "Bearer token")
   )
 })
 
 test_that("dsAssignExpr assigns expression to symbol", {
   post <- mock(list(status_code = 200))
-  result <- with_mock(
-    "httr::POST" = post,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    dsAssignExpr(connection, "D", "ls()")
+  result <- with_mocked_bindings(
+    dsAssignExpr(connection, "D", "ls()"),
+    "POST" = post,
+    ".refresh_token_safely" = function(conn) connection
   )
 
   expect_args(post, 1,
-    handle = handle,
-    query = list(async = TRUE),
-    path = "/symbols/D",
-    body = "ls()",
-    config = httr::add_headers(c("Content-Type" = "text/plain",
-                                 "Authorization" = "Bearer token"))
+              handle = handle,
+              query = list(async = TRUE),
+              path = "/symbols/D",
+              body = "ls()",
+              config = httr::add_headers(c("Content-Type" = "text/plain",
+                                           "Authorization" = "Bearer token"))
   )
   expect_s4_class(result, "ArmadilloResult")
 })
 
 test_that("dsAssignExpr deparses function calls in expression", {
   post <- mock(list(status_code = 200))
-  result <- with_mock(
-    "httr::POST" = post,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    dsAssignExpr(connection, "D", call("ls"))
+  result <- with_mocked_bindings(
+    dsAssignExpr(connection, "D", call("ls")),
+    "POST" = post,
+    ".refresh_token_safely" = function(conn) connection
   )
   expect_args(post, 1,
-    handle = handle,
-    query = list(async = TRUE),
-    path = "/symbols/D",
-    body = "ls()",
-    config = httr::add_headers(c("Content-Type" = "text/plain",
-                                 "Authorization" = "Bearer token"))
+              handle = handle,
+              query = list(async = TRUE),
+              path = "/symbols/D",
+              body = "ls()",
+              config = httr::add_headers(c("Content-Type" = "text/plain",
+                                           "Authorization" = "Bearer token"))
   )
 })
 
@@ -486,47 +486,47 @@ test_that("dsAssignExpr, when called synchronously, waits for result", {
   post <- mock(list(status_code = 200))
   retry <- mock(list(status_code = 200))
   httr_content <- mock(NULL)
-  result <- with_mock(
-    "httr::POST" = post,
-    "httr::RETRY" = retry,
-    "httr::content" = httr_content,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    dsAssignExpr(connection, "D", "ls()", async = FALSE)
+  result <- with_mocked_bindings(
+    dsAssignExpr(connection, "D", "ls()", async = FALSE),
+    "POST" = post,
+    "RETRY" = retry,
+    "content" = httr_content,
+    ".refresh_token_safely" = function(conn) connection
   )
   expect_args(post, 1,
-    handle = handle,
-    query = list(async = FALSE),
-    path = "/symbols/D",
-    body = "ls()",
-    config = httr::add_headers(c("Content-Type" = "text/plain",
-                                 "Authorization" = "Bearer token"))
+              handle = handle,
+              query = list(async = FALSE),
+              path = "/symbols/D",
+              body = "ls()",
+              config = httr::add_headers(c("Content-Type" = "text/plain",
+                                           "Authorization" = "Bearer token"))
   )
   expect_args(retry, 1,
-    verb = "GET",
-    handle = handle,
-    path = "/lastresult",
-    terminate_on = c(200, 404, 401),
-    config = httr::add_headers(c("Accept" = "application/octet-stream",
-                                 "Authorization" = "Bearer token"))
+              verb = "GET",
+              handle = handle,
+              path = "/lastresult",
+              terminate_on = c(200, 404, 401),
+              config = httr::add_headers(c("Accept" = "application/octet-stream",
+                                           "Authorization" = "Bearer token"))
   )
   expect_s4_class(result, "ArmadilloResult")
 })
 
 test_that("dsAggregate executes deparsed query", {
   post <- mock(list(status_code = 200))
-  result <- with_mock(
-    "httr::POST" = post,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    dsAggregate(connection, call("ls"))
+  result <- with_mocked_bindings(
+    dsAggregate(connection, call("ls")),
+    "POST" = post,
+    ".refresh_token_safely" = function(conn) connection
   )
 
   expect_args(post, 1,
-    handle = handle,
-    query = list(async = TRUE),
-    path = "/execute",
-    body = "ls()",
-    config = httr::add_headers(c("Content-Type" = "text/plain",
-                                 "Authorization" = "Bearer token"))
+              handle = handle,
+              query = list(async = TRUE),
+              path = "/execute",
+              body = "ls()",
+              config = httr::add_headers(c("Content-Type" = "text/plain",
+                                           "Authorization" = "Bearer token"))
   )
   expect_s4_class(result, "ArmadilloResult")
 })
@@ -535,28 +535,28 @@ test_that("dsAssignExpr, when called synchronously, waits for result", {
   post <- mock(list(status_code = 200))
   retry <- mock(list(status_code = 200))
   httr_content <- mock(base::serialize("Hello World!", NULL))
-  result <- with_mock(
-    "httr::POST" = post,
-    "httr::RETRY" = retry,
-    "httr::content" = httr_content,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    dsAggregate(connection, "ls()", async = FALSE)
+  result <- with_mocked_bindings(
+    dsAggregate(connection, "ls()", async = FALSE),
+    "POST" = post,
+    "RETRY" = retry,
+    "content" = httr_content,
+    ".refresh_token_safely" = function(conn) connection
   )
   expect_args(post, 1,
-    handle = handle,
-    query = list(async = FALSE),
-    path = "/execute",
-    body = "ls()",
-    config = httr::add_headers(c("Content-Type" = "text/plain",
-                                 "Authorization" = "Bearer token"))
+              handle = handle,
+              query = list(async = FALSE),
+              path = "/execute",
+              body = "ls()",
+              config = httr::add_headers(c("Content-Type" = "text/plain",
+                                           "Authorization" = "Bearer token"))
   )
   expect_args(retry, 1,
-    verb = "GET",
-    handle = handle,
-    path = "/lastresult",
-    terminate_on = c(200, 404, 401),
-    config = httr::add_headers(c("Accept" = "application/octet-stream",
-                                 "Authorization" = "Bearer token"))
+              verb = "GET",
+              handle = handle,
+              path = "/lastresult",
+              terminate_on = c(200, 404, 401),
+              config = httr::add_headers(c("Accept" = "application/octet-stream",
+                                           "Authorization" = "Bearer token"))
   )
   expect_s4_class(result, "ArmadilloResult")
   expect_equal(dsFetch(result), "Hello World!")
@@ -569,12 +569,12 @@ test_that("dsAssignExpr handles error when called synchronously", {
     status = "FAILED",
     message = "Error"
   ))
-  error <- expect_error(with_mock(
-    "httr::POST" = post,
-    "httr::GET" = get,
-    "httr::content" = content,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    dsAggregate(connection, "ls()", async = FALSE)
+  error <- expect_error(with_mocked_bindings(
+    dsAggregate(connection, "ls()", async = FALSE),
+    "POST" = post,
+    "GET" = get,
+    "content" = content,
+    ".refresh_token_safely" = function(conn) connection
   ), "Internal server error: Error")
 })
 
@@ -598,11 +598,11 @@ test_that("dsGetInfo returns server info", {
     )
   )
   httr_content <- mock(server_info)
-  result <- with_mock(
-    "httr::GET" = get,
-    "httr::content" = httr_content,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    dsGetInfo(connection)
+  result <- with_mocked_bindings(
+    dsGetInfo(connection),
+    "GET" = get,
+    "content" = httr_content,
+    ".refresh_token_safely" = function(conn) connection
   )
 
   expected <- list(
@@ -614,23 +614,23 @@ test_that("dsGetInfo returns server info", {
   )
   expect_equivalent(result, expected)
   expect_args(get, 1,
-    handle = handle,
-    path = "/actuator/info",
-    config = httr::add_headers("Authorization" = "Bearer token")
+              handle = handle,
+              path = "/actuator/info",
+              config = httr::add_headers("Authorization" = "Bearer token")
   )
 })
 
 test_that("dsKeepAlive pings server info endpoint", {
   get <- mock(list(status_code = 200))
-  result <- with_mock(
-    "httr::GET" = get,
-    "DSMolgenisArmadillo:::.refresh_token_safely" = function(conn) connection,
-    dsKeepAlive(connection)
+  result <- with_mocked_bindings(
+    dsKeepAlive(connection),
+    "GET" = get,
+    ".refresh_token_safely" = function(conn) connection
   )
 
   expect_args(get, 1,
-    handle = handle,
-    path = "/actuator/info",
-    config = httr::add_headers("Authorization" = "Bearer token")
+              handle = handle,
+              path = "/actuator/info",
+              config = httr::add_headers("Authorization" = "Bearer token")
   )
 })
