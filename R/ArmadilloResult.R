@@ -33,6 +33,7 @@ methods::setClass("ArmadilloResult",
 #' (`\{ "status" = "COMPLETED" \}`).
 #'
 #' @importMethodsFrom DSI dsGetInfo
+#' @importFrom httr GET content add_headers
 #' @export
 methods::setMethod(
   "dsGetInfo", "ArmadilloResult",
@@ -40,10 +41,10 @@ methods::setMethod(
     if (dsObj@rval$async) {
 
       .retry_until_last_result(dsObj@conn)
-      result <- httr::GET(
+      result <- GET(
         handle = dsObj@conn@handle,
         path = "/lastcommand",
-        config = httr::add_headers(.get_auth_header(dsObj@conn))
+        config = add_headers(.get_auth_header(dsObj@conn))
       )
       if(result$status == 404){
         list(
@@ -51,7 +52,7 @@ methods::setMethod(
           error = paste0("No value table exists with the specified name.")
         )
       } else
-      httr::content(result)
+      content(result)
     } else {
       list(status = "COMPLETED")
     }
@@ -93,17 +94,18 @@ methods::setMethod(
 #' @return TRUE if operation is completed.
 #'
 #' @importMethodsFrom DSI dsIsCompleted
+#' @importFrom httr GET add_headers content
 #' @export
 methods::setMethod(
   "dsIsCompleted", "ArmadilloResult",
   function(res) { # nolint
     if (res@rval$async) {
-      result <- httr::GET(
+      result <- GET(
         handle = res@conn@handle,
         path = "/lastcommand",
-        config = httr::add_headers(.get_auth_header(res@conn))
+        config = add_headers(.get_auth_header(res@conn))
       )
-      status <- httr::content(result)$status
+      status <- content(result)$status
       status == "COMPLETED" || status == "FAILED"
     } else {
       TRUE
