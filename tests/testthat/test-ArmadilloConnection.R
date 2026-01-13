@@ -634,3 +634,35 @@ test_that("dsKeepAlive pings server info endpoint", {
               config = httr::add_headers("Authorization" = "Bearer token")
   )
 })
+
+test_that("dsRestoreWorkspace calls /load-workspace endpoint", {
+  post <- mock(list(status_code = 200))
+
+  with_mocked_bindings(
+    dsRestoreWorkspace(connection, "keepit"),
+    "POST" = post,
+    ".refresh_token_safely" = function(conn) connection
+  )
+
+  expect_called(post, 1)
+  expect_args(post, 1,
+              handle = handle,
+              query = list(id = "keepit"),
+              path = "/load-workspace",
+              config = httr::add_headers("Authorization" = "Bearer token"))
+})
+
+test_that("dsRestoreWorkspace handles missing workspace error", {
+  post <- mock(list(
+    status_code = 500,
+    content = list(message = "Not Found")
+  ))
+
+  expect_error(
+    with_mocked_bindings(
+      dsRestoreWorkspace(connection, "nonexistent"),
+      "POST" = post,
+      ".refresh_token_safely" = function(conn) connection
+    )
+  )
+})
