@@ -660,3 +660,29 @@ methods::setMethod(
     invisible(NULL)
   }
 )
+
+#' Restore workspace
+#'
+#' This method implementation for the ArmadilloConnection class sends an authenticated POST request
+#' to the Armadillo /load-workspace endpoint. It reloads a previously saved R session state
+#' (workspace) using the provided name as the identifier.
+#'
+#' @param conn \code{\link{ArmadilloConnection-class}} class object
+#' @param name Name of the workspace.
+#'
+#' @importMethodsFrom DSI dsRestoreWorkspace
+#' @export
+methods::setMethod(
+  "dsRestoreWorkspace", "ArmadilloConnection", function(conn, name) {
+    conn <- .refresh_token_safely(conn)
+
+    restore_response <- POST(
+      handle = conn@handle,
+      query = list(id = name),
+      path = "/load-workspace",
+      config =  httr::add_headers(.get_auth_header(conn))
+    )
+
+    .handle_request_error(restore_response)
+  }
+)
