@@ -19,7 +19,7 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
-
+    
 
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">DSMolgenisArmadillo</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.0</span>
       </span>
     </div>
 
@@ -48,7 +48,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-
+     
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
@@ -68,7 +68,7 @@
 <li>
   <a href="https://github.com/molgenis/molgenis-r-datashield/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-
+     
   </a>
 </li>
       </ul>
@@ -79,7 +79,7 @@
 </div>
 <!--/.navbar -->
 
-
+      
 
       </header><div class="row">
   <div class="contents col-md-9">
@@ -94,7 +94,7 @@
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
 <p>You can use DSMolgenisArmadillo to analyse data shared in MOLGENIS Armadillo servers using DataSHIELD. DataSHIELD allows execution of a subset of analysis methods available in R. Methods such as:</p>
-<p><code><a href="https://rdrr.io/pkg/dsBaseClient/man/ds.mean.html" class="external-link">ds.mean()</a></code> <code><a href="https://rdrr.io/pkg/dsBaseClient/man/ds.glm.html" class="external-link">ds.glm()</a></code> <code><a href="https://rdrr.io/pkg/dsBaseClient/man/ds.lmerSLMA.html" class="external-link">ds.lmerSLMA()</a></code></p>
+<p><code>ds.mean()</code> <code>ds.glm()</code> <code>ds.lmerSLMA()</code></p>
 <p>For more detailed documentation check: <a href="https://cran.datashield.org/" class="external-link uri">https://cran.datashield.org/</a>.</p>
 </div>
 <div class="section level2">
@@ -157,10 +157,10 @@
 <p>DataSHIELD has a range of methods you can use to perform analysis. Check: the <a href="https://cran.datashield.org/web/#client-packages" class="external-link">dsBaseClient</a> documentation to see which methods are available.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># calculate the mean</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/dsBaseClient/man/ds.mean.html" class="external-link">ds.mean</a></span><span class="op">(</span><span class="st">"core_nonrep$coh_country"</span>, datasources <span class="op">=</span> <span class="va">conns</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">ds.mean</span><span class="op">(</span><span class="st">"core_nonrep$coh_country"</span>, datasources <span class="op">=</span> <span class="va">conns</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># create a histogram</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/dsBaseClient/man/ds.histogram.html" class="external-link">ds.histogram</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"core_nonrep$coh_country"</span>, datasources <span class="op">=</span> <span class="va">conns</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">ds.histogram</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"core_nonrep$coh_country"</span>, datasources <span class="op">=</span> <span class="va">conns</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -211,11 +211,11 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Mariska Slofstra <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-0400-0468" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
-<li>Sido Haakma <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0003-1278-9144" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
-<li>Tommy de Boer <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-4492-7225" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
-<li>Fleur Kelpin <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0003-1527-5130" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
-<li>MOLGENIS org <br><small class="roles"> Copyright holder, funder </small>   </li>
+<li>Mariska Slofstra <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-0400-0468" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Sido Haakma <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0003-1278-9144" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Tommy de Boer <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-4492-7225" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Fleur Kelpin <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0003-1527-5130" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>MOLGENIS org <br><small class="roles"> Copyright holder, funder </small>  </li>
 </ul>
 </div>
 
@@ -239,16 +239,16 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer>
 </div>
 
+  
 
 
-
-
+  
 
   </body>
 </html>
