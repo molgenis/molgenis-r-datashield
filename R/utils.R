@@ -52,6 +52,10 @@
     stop(paste0("Bad request: ", json_content$message), call. = FALSE)
   } else if (response$status_code == 401) {
     stop("Unauthorized", call. = FALSE)
+  } else if (response$status_code == 403) {
+    stop("Access denied", call. = FALSE)
+  } else if (response$status_code == 404) {
+    stop("Not found", call. = FALSE)
   } else if (response$status_code == 500) {
     json_content <- content(response, "text")
     stop(paste0("Internal server error: ", json_content), call. = FALSE)
