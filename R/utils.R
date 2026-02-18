@@ -104,17 +104,17 @@
                                  .get_auth_header(conn)))
   )
 
+  if (response$status_code == 404) {
+    return(.handle_last_command_error(conn))
+  }
+
   .handle_request_error(response)
 
-  if (response$status_code == 404) {
-    .handle_last_command_error(conn)
+  content <- content(response)
+  if (is.null(content)) {
+    NULL
   } else {
-    content <- content(response)
-    if (is.null(content)) {
-      NULL
-    } else {
-      unserialize(content)
-    }
+    unserialize(content)
   }
 }
 

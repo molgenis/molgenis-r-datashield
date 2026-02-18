@@ -71,13 +71,12 @@ methods::setMethod(
       path = "/profiles",
       config = httr::add_headers(.get_auth_header(conn))
     )
-    .handle_request_error(response)
+
     if (response$status_code == 404) {
-      # endpoint not implemented, fake it!
-      list(available = "default", current = "default")
-    } else {
-      content(response)
+      return(list(available = "default", current = "default"))
     }
+    .handle_request_error(response)
+    content(response)
   }
 )
 
@@ -129,6 +128,7 @@ methods::setMethod(
       config = httr::add_headers(.get_auth_header(conn))
     )
 
+    if (response$status_code == 404) return(FALSE)
     .handle_request_error(response)
 
     response$status_code == 200
@@ -181,6 +181,8 @@ methods::setMethod(
       path = paste0("/resources/", resource),
       config = httr::add_headers(.get_auth_header(conn))
     )
+
+    if (response$status_code == 404) return(FALSE)
     .handle_request_error(response)
 
     response$status_code == 200
