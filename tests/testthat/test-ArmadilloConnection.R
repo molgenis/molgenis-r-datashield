@@ -343,6 +343,7 @@ test_that("dsListMethods returns assign methods", {
     class = "function"
   )
 
+  expect_equal(colnames(result), c("name", "value", "version", "package", "type", "class"))
   expect_equivalent(result, expected)
 })
 
