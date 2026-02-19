@@ -47,7 +47,7 @@ jobs:
     - run:
         name: Install R deps takes 15min, but no worries we skipinstalled from cache when this PR has installed them before
         command: |
-          install2.r --repos=https://cloud.r-project.org MolgenisAuth
+          install2.r --repos=https://cloud.r-project.org MolgenisAuth knitr
           install2.r --repos=https://cloud.r-project.org --skipinstalled devtools pkgdown markdown rmarkdown mockery webmockr httr urltools xml2 arrow DSI git2r ellipsis vctrs covr desc metafor fields meta gridExtra
           Rscript -e 'install.packages("dsBaseClient", repos = "https://cran.obiba.org/")'
 
@@ -57,7 +57,7 @@ jobs:
           export PACKAGE=`grep Package DESCRIPTION | head -n1 | cut -d':' -f2 | xargs`
           export TAG=`grep Version DESCRIPTION | head -n1 | cut -d':' -f2 | xargs`
           echo "Testing ${PACKAGE}:${TAG}"
-          Rscript -e 'devtools::check(remote=TRUE, force_suggests = FALSE, error_on="error", --no-build-vignettes)'
+          Rscript -e 'devtools::check(remote=TRUE, force_suggests = FALSE, error_on="error")'
           Rscript -e 'library(covr);codecov()'
           R CMD build .
           Rscript -e "devtools::check_built(path = './${PACKAGE}_${TAG}.tar.gz', remote=TRUE, force_suggests = FALSE)"
