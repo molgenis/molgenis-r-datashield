@@ -48,7 +48,7 @@ jobs:
         name: Install R deps takes 15min, but no worries we skipinstalled from cache when this PR has installed them before
         command: |
           install2.r --repos=https://cloud.r-project.org MolgenisAuth
-          install2.r --repos=https://cloud.r-project.org --skipinstalled devtools pkgdown markdown rmarkdown mockery webmockr httr urltools xml2 arrow DSI git2r ellipsis vctrs covr desc metafor fields meta gridExtra
+          install2.r --repos=https://cloud.r-project.org --skipinstalled devtools pkgdown markdown rmarkdown mockery webmockr httr urltools xml2 arrow DSI git2r ellipsis vctrs covr desc metafor fields meta gridExtra knitr
           Rscript -e 'install.packages("dsBaseClient", repos = "https://cran.obiba.org/")'
 
     - run:
