@@ -63,6 +63,20 @@ test_that(".handle_request_error handles 401", {
   )
 })
 
+test_that(".handle_request_error handles 403", {
+  expect_error(
+    .handle_request_error(list(status_code = 403)),
+    "Access denied"
+  )
+})
+
+test_that(".handle_request_error handles 404", {
+  expect_error(
+    .handle_request_error(list(status_code = 404)),
+    "Not found"
+  )
+})
+
 test_that(".handle_request_error handles 400", {
   response     <- list(status_code = 400)
   httr_content <- mock(list(message = "Error"))

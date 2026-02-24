@@ -52,6 +52,10 @@
     stop(paste0("Bad request: ", json_content$message), call. = FALSE)
   } else if (response$status_code == 401) {
     stop("Unauthorized", call. = FALSE)
+  } else if (response$status_code == 403) {
+    stop("Access denied", call. = FALSE)
+  } else if (response$status_code == 404) {
+    stop("Not found", call. = FALSE)
   } else if (response$status_code == 500) {
     json_content <- content(response, "text")
     stop(paste0("Internal server error: ", json_content), call. = FALSE)
@@ -100,17 +104,17 @@
                                  .get_auth_header(conn)))
   )
 
+  if (response$status_code == 404) {
+    return(.handle_last_command_error(conn))
+  }
+
   .handle_request_error(response)
 
-  if (response$status_code == 404) {
-    .handle_last_command_error(conn)
+  content <- content(response)
+  if (is.null(content)) {
+    NULL
   } else {
-    content <- content(response)
-    if (is.null(content)) {
-      NULL
-    } else {
-      unserialize(content)
-    }
+    unserialize(content)
   }
 }
 
