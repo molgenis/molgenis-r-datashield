@@ -392,7 +392,7 @@ methods::setMethod(
     df <- .list_to_data_frame(content(response))
     df <- .fill_column(df, "type", type)
     df <- .fill_column(df, "class", "function")
-    df <- .rename_column(df, "function", "value")
+    df <- .rename_column(df, "function.", "value")
   }
 )
 
