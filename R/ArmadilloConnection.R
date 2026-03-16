@@ -128,7 +128,7 @@ methods::setMethod(
       config = httr::add_headers(.get_auth_header(conn))
     )
 
-    if (response$status_code == 404) return(FALSE)
+    if (response$status_code %in% c(403, 404)) return(FALSE)
     .handle_request_error(response)
 
     response$status_code == 200
@@ -182,7 +182,7 @@ methods::setMethod(
       config = httr::add_headers(.get_auth_header(conn))
     )
 
-    if (response$status_code == 404) return(FALSE)
+    if (response$status_code %in% c(403, 404)) return(FALSE)
     .handle_request_error(response)
 
     response$status_code == 200

@@ -155,6 +155,24 @@ test_that("dsHasResource returns FALSE if table doesnot exist", {
   )
 })
 
+test_that("dsHasTable returns FALSE if access denied", {
+  head <- mock(list(status_code = 403))
+  with_mocked_bindings(
+    expect_false(dsHasTable(connection, "project/folder/name.parquet")),
+    "HEAD" = head,
+    ".refresh_token_safely" = function(conn) connection
+  )
+})
+
+test_that("dsHasResource returns FALSE if access denied", {
+  head <- mock(list(status_code = 403))
+  with_mocked_bindings(
+    expect_false(dsHasResource(connection, "project/folder/name")),
+    "HEAD" = head,
+    ".refresh_token_safely" = function(conn) connection
+  )
+})
+
 test_that("dsIsAsync returns boolean list", {
   expect_equal(
     dsIsAsync(connection),
