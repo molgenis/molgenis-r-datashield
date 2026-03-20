@@ -1,24 +1,8 @@
-test_that("get_token returns the id_token from credentials", {
-  mock_credentials <- new("ArmadilloCredentials",
-                          access_token = "access123",
-                          expires_in = 3600,
-                          expires_at = Sys.time() + 3600,
-                          id_token = "abcd-abcd",
-                          refresh_token = "refresh123",
-                          token_type = "Bearer"
+test_that("get_token is defunct", {
+  expect_error(
+    armadillo.get_token("https://example.org"),
+    "armadillo.get_token.*is defunct"
   )
-
-  expect_warning(
-    with_mocked_bindings({
-      token <<- armadillo.get_token("https://example.org")
-    },
-    armadillo.get_credentials = function(server) mock_credentials,
-    .package = "DSMolgenisArmadillo"
-    ),
-    class = "lifecycle_warning_deprecated"
-  )
-
-  expect_equal(token, "abcd-abcd")
 })
 
 test_that("armadillo.get_credentials returns a valid ArmadilloCredentials object", {

@@ -9,9 +9,9 @@ armadillo.get_token(server)
 \arguments{
 \item{server}{the URL of the Armadillo server}
 }
-\value{
-The ID token string
-}
 \description{
-Get an ID token to log in on an Armadillo server
+`r lifecycle::badge("defunct")`
+}
+\details{
+This function is defunct. Use [armadillo.get_credentials()] instead.
 }

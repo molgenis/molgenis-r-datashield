@@ -1,18 +1,22 @@
 #' Get ID Token
 #'
-#' Get an ID token to log in on an Armadillo server
+#' `r lifecycle::badge("defunct")`
+#'
+#' This function is defunct. Use [armadillo.get_credentials()] instead.
 #'
 #' @param server the URL of the Armadillo server
 #'
-#' @return The ID token string
-#'
-#' @importFrom MolgenisAuth discover device_flow_auth
-#'
 #' @export
 armadillo.get_token <- function(server) { # nolint
-  lifecycle::deprecate_warn("3.0.0", "armadillo.get_token()", "armadillo.get_credentials()")
-  credentials <- armadillo.get_credentials(server)
-  return(credentials@id_token)
+  .Defunct(
+    new = "armadillo.get_credentials",
+    msg = paste(
+      "'armadillo.get_token()' is defunct. Use 'armadillo.get_credentials()' instead.",
+      "\n\nExample usage:",
+      "\n  credentials <- armadillo.get_credentials(server)",
+      "\n  builder$append(token = credentials@access_token, ...)"
+    )
+  )
 }
 
 #' @title ArmadilloCredentials Class
