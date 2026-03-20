@@ -10,8 +10,8 @@ armadillo.get_token(server)
 \item{server}{the URL of the Armadillo server}
 }
 \description{
-`r lifecycle::badge("defunct")`
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#defunct}{\figure{lifecycle-defunct.svg}{options: alt='[Defunct]'}}}{\strong{[Defunct]}}
 }
 \details{
-This function is defunct. Use [armadillo.get_credentials()] instead.
+This function is defunct. Use \code{\link[=armadillo.get_credentials]{armadillo.get_credentials()}} instead.
 }

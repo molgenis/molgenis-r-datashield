@@ -7,5 +7,5 @@
 armadillo()
 }
 \description{
-Convenience function for creating a [ArmadilloDriver] object.
+Convenience function for creating a \linkS4class{ArmadilloDriver} object.
 }
