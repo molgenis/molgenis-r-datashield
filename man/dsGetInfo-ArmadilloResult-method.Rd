@@ -13,8 +13,8 @@
 }
 \value{
 The result information. This should include the R expression
-being executed (`expression`) and if the query is complete
-(`\{ "status" = "COMPLETED" \}`).
+being executed (\code{expression}) and if the query is complete
+(\verb{\\\{ "status" = "COMPLETED" \\\}}).
 }
 \description{
 Await completion and get the information about a command

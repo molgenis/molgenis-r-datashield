@@ -13,7 +13,7 @@
 }
 \value{
 The connection information. This returns the version of the
-package (`driver.version`). There is no underlying client library.
+package (\code{driver.version}). There is no underlying client library.
 }
 \description{
 Get information about a driver.

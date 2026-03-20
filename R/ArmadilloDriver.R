@@ -12,7 +12,7 @@ methods::setClass("ArmadilloDriver", contains = "DSDriver")
 
 #' Create an Armadillo DataSHIELD Service driver
 #'
-#' Convenience function for creating a [ArmadilloDriver] object.
+#' Convenience function for creating a [ArmadilloDriver-class] object.
 #'
 #' @export
 armadillo <- function() {
