@@ -1,10 +1,8 @@
-#' Get ID Token
-#'
+#' @rdname DSMolgenisArmadillo-defunct
+#' @section `armadillo.get_token`:
 #' `r lifecycle::badge("defunct")`
 #'
-#' This function is defunct. Use [armadillo.get_credentials()] instead.
-#'
-#' @param server the URL of the Armadillo server
+#' For `armadillo.get_token`, use [armadillo.get_credentials()] instead.
 #'
 #' @export
 armadillo.get_token <- function(server) { # nolint
