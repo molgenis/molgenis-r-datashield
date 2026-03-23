@@ -13,9 +13,9 @@
 }
 \value{
 The connection information. This should report the version of
-the data repository application (`repo.version`) and its name (`repo.name`),
-the database name (`dbname`), username, (`username`), host (`host`), port
-(`port`), etc.
+the data repository application (\code{repo.version}) and its name (\code{repo.name}),
+the database name (\code{dbname}), username, (\code{username}), host (\code{host}), port
+(\code{port}), etc.
 It MAY also include any other arguments related to the connection
 (e.g., thread id, socket or TCP connection type). It MUST NOT include the
 password.

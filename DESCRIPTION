@@ -67,6 +67,8 @@ Collate:
     'ArmadilloConnection.R'
     'ArmadilloOAuth.R'
     'ArmadilloResult.R'
+    'DSMolgenisArmadillo-defunct.R'
     'DSMolgenisArmadillo-package.R'
     'utils.R'
 Additional_repositories: https://cran.obiba.org/
+Roxygen: list(markdown = TRUE)
