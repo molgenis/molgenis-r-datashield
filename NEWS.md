@@ -1,5 +1,7 @@
 # DSMolgenisArmadillo 4.0.0
 Fixed implementation of datashield.methods() so that it returns the correct column names, matching with dsOpal behaviour.
+Fixed error handling for 403 and 404 response
+Feature: added method for restore_workspace to be compatible with latest version of DSI
 
 # DSMolgenisArmadillo 3.0.2
 Switched test mocking to `with_mocked_bindings` as `with_mock` is now depricated.
