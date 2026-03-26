@@ -70,5 +70,4 @@ Collate:
     'DSMolgenisArmadillo-defunct.R'
     'DSMolgenisArmadillo-package.R'
     'utils.R'
-Additional_repositories: https://cran.obiba.org/
 Roxygen: list(markdown = TRUE)

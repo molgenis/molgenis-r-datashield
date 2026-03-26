@@ -14,3 +14,5 @@ test.RData
 ^docs$
 ^DSMolgenisArmadillo_.*\.tar\.gz$
 .circleci
+.claude
+.idea
