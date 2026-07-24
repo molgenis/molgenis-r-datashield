@@ -105,6 +105,20 @@ test_that(".handle_request_error handles 500", {
   )
 })
 
+test_that(".handle_request_error handles 503", {
+  response     <- list(status_code = 503)
+  httr_content <- mock("Could not connect to the profile's R server.")
+
+  with_mocked_bindings({
+    expect_error(
+      .handle_request_error(response),
+      "Service unavailable: Could not connect to the profile's R server."
+    )
+  },
+  content = httr_content
+  )
+})
+
 test_that(".unlist_character_list handles empty list", {
   expect_equal(.unlist_character_list(list()), character())
 })
