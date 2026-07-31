@@ -59,6 +59,9 @@
   } else if (response$status_code == 500) {
     json_content <- content(response, "text")
     stop(paste0("Internal server error: ", json_content), call. = FALSE)
+  } else if (response$status_code == 503) {
+    json_content <- content(response, "text")
+    stop(paste0("Service unavailable: ", json_content), call. = FALSE)
   }
 }
 
