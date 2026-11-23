@@ -1,3 +1,8 @@
+# DSMolgenisArmadillo 4.0.3
+Fix: added error handling for 503 (service unavailable) responses.
+Fix: silenced an encoding warning when reading response content.
+Removed the external repository for dsBaseClient, as it is now on CRAN.
+
 # DSMolgenisArmadillo 4.0.0
 Fixed implementation of datashield.methods() so that it returns the correct column names, matching with dsOpal behaviour.
 Fixed error handling for 403 and 404 response
