@@ -34,30 +34,40 @@ importClassesFrom(DSI,DSConnection)
 importClassesFrom(DSI,DSDriver)
 importClassesFrom(DSI,DSResult)
 importFrom(DSI,datashield.connections_find)
-importFrom(MolgenisAuth,device_flow_auth)
-importFrom(MolgenisAuth,discover)
+importFrom(MolgenisAuth,
+  device_flow_auth,
+  discover
+)
 importFrom(base64enc,base64encode)
-importFrom(dplyr,"%>%")
-importFrom(dplyr,bind_rows)
-importFrom(httr,DELETE)
-importFrom(httr,GET)
-importFrom(httr,HEAD)
-importFrom(httr,POST)
-importFrom(httr,RETRY)
-importFrom(httr,add_headers)
-importFrom(httr,content)
-importFrom(httr,cookies)
-importFrom(httr,handle)
-importFrom(httr,set_cookies)
-importFrom(httr,stop_for_status)
+importFrom(dplyr,
+  "%>%",
+  bind_rows
+)
+importFrom(httr,
+  DELETE,
+  GET,
+  HEAD,
+  POST,
+  RETRY,
+  add_headers,
+  content,
+  cookies,
+  handle,
+  set_cookies,
+  stop_for_status
+)
 importFrom(jsonlite,fromJSON)
 importFrom(lifecycle,deprecated)
-importFrom(methods,getClass)
-importFrom(methods,new)
-importFrom(stringr,str_extract)
-importFrom(stringr,str_length)
-importFrom(stringr,str_remove)
-importFrom(stringr,str_remove_all)
+importFrom(methods,
+  getClass,
+  new
+)
+importFrom(stringr,
+  str_extract,
+  str_length,
+  str_remove,
+  str_remove_all
+)
 importFrom(tibble,tibble)
 importFrom(urltools,path)
 importFrom(utils,packageVersion)

@@ -67,7 +67,7 @@
 
 #' Unlist character list
 #'
-#' @param character_list
+#' @param character_list list of character values
 #'
 #' @noRd
 .unlist_character_list <- function(character_list) {
